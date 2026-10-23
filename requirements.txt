@@ -1,0 +1,2 @@
+﻿# Core dependencies for Clarity Lint
+# (Dependencies will be specified as modules are implemented)
