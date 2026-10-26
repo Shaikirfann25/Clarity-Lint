@@ -1,0 +1,1 @@
+This folder is reserved for explicitly permitted demo or team-provided data. Do not commit private contracts or copyrighted/private documents without permission. Use the team's frozen train/dev/test split files for final evaluation; never substitute synthetic demo fixtures for real results.
