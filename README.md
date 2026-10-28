@@ -3,11 +3,11 @@
 An automated code readability, complexity, and linting assistant designed to help developers write cleaner, more maintainable code.
 
 ## Team Members
-- Shaik (Me)
-- Chaitu
-- Rajiv
-- Sudharshan
-- Aman
+- Shaik Irfan
+- Karanam Chaitanya 
+- Rajeev Kumar
+- Sudharshan Karmakar
+- Aman Kumar
 
 ## Directory Structure
 ```text
