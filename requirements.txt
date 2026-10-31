@@ -1,2 +1,25 @@
-﻿# Core dependencies for Clarity Lint
-# (Dependencies will be specified as modules are implemented)
+# ==============================================================================
+# Clarity Lint — Project Dependencies
+# Recommended Python Runtime: Python 3.11 (or 3.12)
+# ==============================================================================
+
+# Core Data Processing, Evaluation & Testing
+pandas>=2.1.0
+scikit-learn>=1.3.0
+pytest>=7.4.0
+
+# User Interface & Visualizations (Streamlit Dashboard)
+streamlit>=1.30.0
+plotly>=5.18.0
+
+# Transformer Classifier & Deep Learning (DistilBERT Model)
+torch>=2.1.0
+transformers>=4.36.0
+datasets>=2.16.0
+accelerate>=0.25.0
+
+# Linguistic Rule Engine & Text Processing
+spacy>=3.7.0
+
+# Zero-Shot Prompt Baseline & Utilities
+requests>=2.31.0
