@@ -1,0 +1,21 @@
+sentence,label,explanation,source_type
+The system should respond quickly.,vague,The word 'quickly' has no measurable threshold — it could mean 100 ms or 5 seconds depending on context.,synthetic
+Please send the update soon.,vague,The word 'soon' is not time-bound — it could mean minutes or days without more context.,synthetic
+The application must handle a large volume of requests.,vague,The word 'large' is relative and undefined; no specific number or range is given.,synthetic
+The UI should be simple and user-friendly.,vague,Both 'simple' and 'user-friendly' are subjective terms with no agreed-upon definition.,synthetic
+She saw the man with the telescope.,attachment,The prepositional phrase 'with the telescope' can attach to 'saw' (she used it) or to 'man' (he had it).,synthetic
+We approved the design for the building with the glass roof.,attachment,The phrase 'with the glass roof' can attach to 'building' (the building has a glass roof) or to 'design' (the design incorporates a glass roof) — both readings are natural.,synthetic
+I photographed the tourists visiting the museum.,attachment,'Visiting the museum' can modify 'tourists' (they were visiting) or describe where I photographed them.,synthetic
+The developers need to update the module that is broken urgently.,attachment,'Urgently' can modify 'update' (act urgently) or 'broken' (it is urgently broken/critical).,synthetic
+Every student did not submit the assignment.,scope,This can mean no student submitted (universal negation) or not every student submitted (partial negation).,synthetic
+All employees should attend the meeting or the training.,scope,Unclear whether all must attend both or whether attending either satisfies the requirement.,synthetic
+She does not like coffee or tea.,scope,Ambiguous logical scope: she dislikes both (De Morgan reading) or she does not like at least one of them.,synthetic
+Not every feature must be completed before the deadline.,scope,Scope of 'not' is unclear — it may mean some features can be skipped or that none need to meet the deadline.,synthetic
+When Priya called Ananya she was very upset.,pronoun,The pronoun 'she' is ambiguous — it could refer to Priya or to Ananya.,synthetic
+The team told the clients that they were responsible for testing.,pronoun,The pronoun 'they' is ambiguous — the team or the clients could be responsible.,synthetic
+The manager reviewed the intern's report and then forwarded it to her supervisor.,pronoun,The pronoun 'her' is ambiguous — the manager's supervisor or the intern's supervisor.,synthetic
+The client spoke with the developer and then he cancelled the contract.,pronoun,The pronoun 'he' is ambiguous — it could refer to the client (who cancelled) or the developer (who cancelled) since both are plausible actors.,synthetic
+The server must respond within 200 milliseconds.,no_ambiguity,A precise measurable threshold is given; only one interpretation is possible.,synthetic
+Maria submitted the final report on Friday at 5 PM.,no_ambiguity,One subject one action one specific time — completely unambiguous.,synthetic
+The red button on the left panel opens the emergency exit door.,no_ambiguity,The modifier 'on the left panel' clearly belongs to 'button'; no alternative attachment is plausible.,synthetic
+All five team members must approve the pull request before merging.,no_ambiguity,The quantifier 'all five' is precise and the scope of approval is clearly defined.,synthetic
