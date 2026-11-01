@@ -4,6 +4,14 @@ Classifies each sentence into one of five ambiguity labels using a
 documented, zero-shot prompt with temperature 0.  The prompt includes
 label definitions and requires strict JSON output.
 
+Note on baseline CSV generation:
+--------------------------------
+The packaged baseline predictions file (outputs/prompt_baseline_predictions.csv)
+was generated using mock mode (--mock) for deterministic offline testing and
+schema validation without requiring an active Gemini API key. It should NOT
+be presented as live Gemini predictions. For real Gemini predictions, set
+GEMINI_API_KEY and run the CLI or predict_zero_shot without mock mode.
+
 Usage (CLI)
 -----------
     python -m src.explanations.baseline --split data/splits/test.csv \\
@@ -270,6 +278,71 @@ def classify_sentence(
     result = validate_prediction(parsed, sentence)
     result["source"] = "prompt"
     return result
+
+
+# ── Batch prediction (integration interface) ──────────────────────────────
+
+def predict_zero_shot(
+    sentences: list[str],
+    *,
+    llm_fn=None,
+    model_name: str = "gemini-2.0-flash",
+    delay: float = 0.0,
+    source: str = "prompt_baseline",
+) -> list[dict[str, Any]]:
+    """Predict ambiguity labels for a batch of sentences using zero-shot prompt.
+
+    Each prediction in the returned list complies with the shared integration schema
+    (docs/shared_schema.json and docs/integration_contract.md):
+    - ``source``: "prompt_baseline"
+    - ``label``: one of {"no_ambiguity", "vague", "attachment", "scope", "pronoun"}
+    - ``span``: exact substring inside the sentence, or None
+    - ``confidence``: None (confidence is never fabricated)
+    - ``reason``: human-readable explanation of why the sentence was classified as such
+
+    Parameters
+    ----------
+    sentences : list[str]
+        A list of sentences to classify.
+    llm_fn : callable or None, optional
+        A callable(sentence) -> str for testing / offline execution.
+        If None, calls the live Gemini API (requires GEMINI_API_KEY).
+    model_name : str, optional
+        Gemini model name to use when llm_fn is None (default: "gemini-2.0-flash").
+    delay : float, optional
+        Delay in seconds between successive LLM API calls for rate limiting (default: 0.0).
+    source : str, optional
+        Source identifier tag for schema integration (default: "prompt_baseline").
+
+    Returns
+    -------
+    list[dict[str, Any]]
+        List of detection dictionaries, one per input sentence, matching the shared schema.
+    """
+    if isinstance(sentences, str):
+        sentences = [sentences]
+
+    results: list[dict[str, Any]] = []
+    for i, s in enumerate(sentences):
+        sentence_str = str(s) if s is not None else ""
+        classification = classify_sentence(
+            sentence_str,
+            llm_fn=llm_fn,
+            model_name=model_name,
+        )
+        prediction = {
+            "source": source,
+            "label": classification["label"],
+            "span": classification["span"],
+            "confidence": None,
+            "reason": classification["reason"],
+        }
+        results.append(prediction)
+
+        if llm_fn is None and delay > 0 and i < len(sentences) - 1:
+            time.sleep(delay)
+
+    return results
 
 
 # ── Batch runner ──────────────────────────────────────────────────────────

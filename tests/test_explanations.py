@@ -23,6 +23,7 @@ from src.explanations.templates import LABELS, TEMPLATES, get_template
 from src.explanations.baseline import (
     classify_sentence,
     parse_llm_response,
+    predict_zero_shot,
     run_baseline,
     strip_code_fences,
     validate_prediction,
@@ -428,4 +429,149 @@ class TestStripCodeFences:
 
     def test_bare_fenced(self):
         assert strip_code_fences('```\n{"a":1}\n```') == '{"a":1}'
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+#  PREDICT ZERO SHOT (BATCH INTERFACE & SHARED SCHEMA VERIFICATION)
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+class TestPredictZeroShot:
+    """Tests for predict_zero_shot batch prediction and integration schema."""
+
+    def test_export_through_explanations_init(self):
+        import src.explanations as pkg
+        assert hasattr(pkg, "predict_zero_shot")
+        assert callable(pkg.predict_zero_shot)
+
+    def test_empty_input(self):
+        assert predict_zero_shot([]) == []
+
+    def test_batch_prediction_multiple_sentences(self):
+        sentences = [
+            "The supplier shall respond soon.",
+            "The admin monitors the user with the sensor.",
+            "The service must return HTTP 200 within 500 milliseconds.",
+        ]
+
+        def mock_llm(s: str) -> str:
+            if "soon" in s:
+                return json.dumps({
+                    "label": "vague",
+                    "span": "soon",
+                    "reason": "'Soon' does not specify a measurable timeframe.",
+                })
+            elif "sensor" in s:
+                return json.dumps({
+                    "label": "attachment",
+                    "span": "with the sensor",
+                    "reason": "PP attachment ambiguity.",
+                })
+            return json.dumps({
+                "label": "no_ambiguity",
+                "span": None,
+                "reason": "Specific measurable criteria.",
+            })
+
+        results = predict_zero_shot(sentences, llm_fn=mock_llm)
+
+        assert isinstance(results, list)
+        assert len(results) == 3
+
+        # Sentence 1: vague
+        assert results[0]["source"] == "prompt_baseline"
+        assert results[0]["label"] == "vague"
+        assert results[0]["span"] == "soon"
+        assert results[0]["confidence"] is None
+        assert "measurable timeframe" in results[0]["reason"]
+
+        # Sentence 2: attachment
+        assert results[1]["source"] == "prompt_baseline"
+        assert results[1]["label"] == "attachment"
+        assert results[1]["span"] == "with the sensor"
+        assert results[1]["confidence"] is None
+
+        # Sentence 3: no_ambiguity
+        assert results[2]["source"] == "prompt_baseline"
+        assert results[2]["label"] == "no_ambiguity"
+        assert results[2]["span"] is None
+        assert results[2]["confidence"] is None
+
+    def test_verify_against_shared_integration_schema(self):
+        from pathlib import Path
+        schema_path = Path("docs/shared_schema.json")
+        assert schema_path.exists(), "docs/shared_schema.json must exist"
+
+        with open(schema_path, "r", encoding="utf-8") as f:
+            shared_schema = json.load(f)
+
+        # Expected prediction format from shared_schema.json
+        expected_sample_pred = shared_schema["predictions"][0]
+        required_keys = set(expected_sample_pred.keys())
+        assert required_keys == {"source", "label", "span", "confidence", "reason"}
+
+        sentences = [
+            "The admin monitors the user with the sensor.",
+            "The system is fast.",
+        ]
+
+        def mock_llm(s: str) -> str:
+            if "sensor" in s:
+                return json.dumps({
+                    "label": "attachment",
+                    "span": "with the sensor",
+                    "reason": "The phrase may attach in more than one way.",
+                })
+            return json.dumps({
+                "label": "vague",
+                "span": "fast",
+                "reason": "Subjective term.",
+            })
+
+        results = predict_zero_shot(sentences, llm_fn=mock_llm)
+        assert len(results) == len(sentences)
+
+        for res, sent in zip(results, sentences):
+            # Check exact keys matching shared integration schema
+            assert set(res.keys()) == required_keys
+            assert isinstance(res["source"], str)
+            assert res["label"] in LABELS
+            if res["span"] is not None:
+                assert isinstance(res["span"], str)
+                assert res["span"] in sent
+            assert res["confidence"] is None  # Prompt baseline never invents confidence
+            assert isinstance(res["reason"], str)
+
+    def test_single_string_coercion(self):
+        def mock_llm(s: str) -> str:
+            return json.dumps({
+                "label": "vague",
+                "span": "soon",
+                "reason": "Vague term.",
+            })
+
+        results = predict_zero_shot("Please reply soon.", llm_fn=mock_llm)
+        assert len(results) == 1
+        assert results[0]["label"] == "vague"
+        assert results[0]["span"] == "soon"
+
+    def test_llm_exception_fallback(self):
+        def mock_failing_llm(s: str) -> str:
+            raise ConnectionError("Network unreachable")
+
+        results = predict_zero_shot(["Any sentence here."], llm_fn=mock_failing_llm)
+        assert len(results) == 1
+        pred = results[0]
+        assert pred["source"] == "prompt_baseline"
+        assert pred["label"] == "no_ambiguity"
+        assert pred["span"] is None
+        assert pred["confidence"] is None
+        assert "Network unreachable" in pred["reason"]
+
+    def test_custom_source_parameter(self):
+        def mock_llm(s: str) -> str:
+            return json.dumps({"label": "no_ambiguity", "span": None, "reason": "Clear."})
+
+        results = predict_zero_shot(["Clear sentence."], llm_fn=mock_llm, source="my_custom_prompt")
+        assert results[0]["source"] == "my_custom_prompt"
 
