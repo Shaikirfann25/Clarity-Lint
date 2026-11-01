@@ -1,4 +1,4 @@
-﻿# Virtual Environment
+# Virtual Environment
 .venv/
 venv/
 ENV/
@@ -37,3 +37,11 @@ build/
 *.egg-info/
 logs/
 *.log
+
+
+# Model weights (255 MB — too large for GitHub; regenerate via src/model/train_classifier.py)
+models/distilbert_clarity_lint/model.safetensors
+models/distilbert_clarity_lint/checkpoints/
+
+# HuggingFace hub cache
+.cache/
