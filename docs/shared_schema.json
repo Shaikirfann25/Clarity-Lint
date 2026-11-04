@@ -1,0 +1,21 @@
+{
+  "sentence_id": "S001",
+  "text": "The admin monitors the user with the sensor.",
+  "gold_label": "attachment",
+  "predictions": [
+    {
+      "source": "rules",
+      "label": "attachment",
+      "span": "with the sensor",
+      "confidence": null,
+      "reason": "The phrase may attach in more than one way."
+    }
+  ],
+  "readings": [
+    "The admin uses a sensor to monitor the user.",
+    "The user has a sensor associated with them."
+  ],
+  "rewrites": [
+    "The admin uses the sensor to monitor the user."
+  ]
+}
