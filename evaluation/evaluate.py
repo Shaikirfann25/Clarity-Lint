@@ -2,8 +2,16 @@
 import argparse
 import json
 from pathlib import Path
+import sys
+
+# Ensure repository root is on sys.path
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 import pandas as pd
 from src.integration.evaluation import evaluate_predictions
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -20,5 +28,7 @@ def main():
     out.write_text(json.dumps(reports, indent=2), encoding="utf-8")
     print(f"Wrote calculated reports to {out}")
     print("Ensure this CSV uses the frozen held-out test set.")
+
+
 if __name__ == "__main__":
     main()

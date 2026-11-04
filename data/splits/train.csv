@@ -1,0 +1,356 @@
+sentence_id,text,label,explanation,source_type
+S022,The migration script should complete in a reasonable amount of time.,vague,'Reasonable' is undefined without a concrete duration.,synthetic
+S093,The repair should be completed in a reasonable amount of time.,vague,'Reasonable amount of time' is not defined.,synthetic
+S225,Every engineer validated the hardware or the software interface.,scope,"Did each engineer validate at least one, or did the engineers validate one thing collectively?",synthetic
+S275,Every engineer validated the hardware interface and the software configuration.,scope,"Did each engineer validate both, or did the team collectively validate the two items?",synthetic
+S360,The administrator found the misconfiguration in the firewall rule and updated it immediately.,pronoun,'It' could refer to the misconfiguration (what was corrected) or the firewall rule (which was updated).,synthetic
+S361,The administrator found the vulnerability in the plugin and removed it immediately.,pronoun,'It' could refer to the vulnerability (the security hole was patched) or to the plugin (the plugin was uninstalled) — both are plausible actions for an administrator.,synthetic
+S331,The HR team notified the department heads that they had to submit performance reviews.,pronoun,'They' could refer to HR (who must submit something) or the department heads (who were notified to do so).,synthetic
+S368,The team built the prototype for the new feature and tested it in the staging environment.,pronoun,'It' could refer to the prototype or the new feature — either could be what was tested.,synthetic
+S367,The teacher marked the mistake in the student's draft and returned it with comments.,pronoun,'It' could refer to the mistake annotation or the draft (which was returned).,synthetic
+S354,The developer discovered the vulnerability in the library and patched it immediately.,pronoun,'It' could refer to the vulnerability (what was patched) or the library (which was patched).,synthetic
+S346,The senior engineers informed the junior engineers that they had missed an important constraint.,pronoun,'They' could refer to the senior engineers (who realized they missed it) or the junior engineers (who were at fault).,synthetic
+S397,The developer fixed the issue and the tester re-ran the suite but it still failed.,pronoun,'It' could refer to the fix (which still fails) or the test suite (which still fails).,synthetic
+S407,The inspector found damage in the component and the engineer documented it for the report.,pronoun,'It' could refer to the damage (what was documented) or the component (which was documented).,synthetic
+S348,The managers instructed the coordinators that they had to resubmit the project proposal.,pronoun,'They' could refer to the managers or the coordinators — either could need to resubmit.,synthetic
+S311,After the CEO briefed the CFO on the quarterly results he requested a follow-up.,pronoun,'He' could refer to the CEO (who wants follow-up) or the CFO (who requested it).,synthetic
+S301,When Priya called Ananya she was very upset.,pronoun,'She' is ambiguous — it could refer to Priya or Ananya.,synthetic
+S319,When Raj emailed Vivek the reply he had not yet read the original message.,pronoun,'He' could refer to Raj (who hadn't read it) or Vivek (who hadn't read it yet).,synthetic
+S332,The designers briefed the developers that they had changed the core wireframes.,pronoun,'They' could refer to the designers (who made changes) or the developers (who changed something on their end).,synthetic
+S392,The project manager and the product owner disagreed and he escalated the matter.,pronoun,'He' could refer to the project manager or the product owner.,synthetic
+S399,After Meera briefed Kavya on the changes she updated the project documentation.,pronoun,'She' could refer to Meera or Kavya — either could update the documentation.,synthetic
+S380,The finance team submitted the report late and this delayed the start of the audit.,pronoun,'This' could refer to the late submission or the report.,synthetic
+S305,After Sara briefed Aisha on the project she left the meeting room.,pronoun,'She' could refer to Sara (who left after briefing) or Aisha (who left after being briefed).,synthetic
+S383,The professor returned the student's thesis with his detailed annotations.,pronoun,'His' could refer to the professor's annotations or the student's own notes.,synthetic
+S334,The marketing team asked the sales team whether they could share the lead list.,pronoun,'They' could refer to the marketing team (asking for permission) or the sales team (being asked).,synthetic
+S313,After the engineer reported the defect he was asked to investigate the root cause.,pronoun,'He' could refer to the engineer (who was asked) or an implied reviewer.,synthetic
+S327,The developers informed the testers that they had missed the regression scenarios.,pronoun,'They' could refer to the developers or the testers — either could have missed them.,synthetic
+S402,The analyst presented the findings to the manager and she acknowledged the report.,pronoun,'She' could refer to the analyst (unusual) or the manager.,synthetic
+S356,The technician found the broken component in the device and replaced it on site.,pronoun,'It' could refer to the broken component or the device itself.,synthetic
+S323,After the head of department spoke to the lecturer he updated the course plan.,pronoun,'He' could refer to the head of department or the lecturer — either could update the plan.,synthetic
+S379,The teacher changed the assessment criteria and this confused many of the students.,pronoun,'This' could refer to the change or the new criteria themselves.,synthetic
+S345,The investors notified the startup founders that they had reservations about the valuation.,pronoun,'They' could refer to the investors or the founders — either could have reservations.,synthetic
+S375,The committee voted to approve the merger and communicated this to all departments.,pronoun,"'This' could refer to the vote, the approval, or the merger itself.",synthetic
+S316,The lead developer told the junior developer that he had introduced a critical bug.,pronoun,'He' could refer to the lead developer (confessing) or the junior developer (being accused).,synthetic
+S343,The clients informed the consultants that they expected a detailed cost breakdown.,pronoun,'They' could refer to the clients (who expect it) or the consultants (who expect it from sub-vendors).,synthetic
+S341,The supervisors told the operators that they had violated the safety protocol.,pronoun,'They' could refer to the supervisors or the operators — either could have violated it.,synthetic
+S310,When Emma called Claire about the deadline she was already travelling.,pronoun,'She' could refer to Emma or Claire — either could be travelling.,synthetic
+S388,The auditor questioned the accountant about her expense report from last quarter.,pronoun,'Her' could refer to the auditor's expense report or the accountant's report.,synthetic
+S312,When the lawyer met the client at the office she outlined the legal options.,pronoun,'She' could refer to the lawyer (who outlined them) or the client (who outlined her situation).,synthetic
+S406,The team lead and the developer debated the solution and he eventually agreed.,pronoun,'He' could refer to the team lead or the developer.,synthetic
+S381,The manager reviewed the intern's portfolio and forwarded it to her supervisor.,pronoun,'Her' could refer to the manager's supervisor or the intern's supervisor.,synthetic
+S329,The parents expressed concerns to the teachers that they were not informed early enough.,pronoun,'They' could refer to the parents (who weren't informed) or the teachers (who weren't informed).,synthetic
+S382,The director asked the analyst to update his model with the latest figures.,pronoun,'His' could refer to the director's model or the analyst's model.,synthetic
+S306,The director told the analyst that he needed to revise the financial forecast.,pronoun,'He' could refer to the director (who will revise it) or the analyst (who was asked to).,synthetic
+S365,The team identified the bottleneck in the data pipeline and optimized it for throughput.,pronoun,'It' could refer to the bottleneck (what was optimized) or the data pipeline (which was optimized).,synthetic
+S357,The tester found the regression in the module and reported it to the development team.,pronoun,'It' could refer to the regression (what was reported) or the module (which was reported as defective).,synthetic
+S340,The testers informed the developers that they had not addressed all the reported failures.,pronoun,'They' could refer to the testers (who had not addressed them) or the developers (who had not fixed them).,synthetic
+S336,The senior staff explained to the junior staff that they were responsible for the incident.,pronoun,'They' could refer to the senior staff or the junior staff — either could be responsible.,synthetic
+S317,When the coach spoke to the athlete about her performance she recommended additional training.,pronoun,'She' could refer to the coach (who recommended) or the athlete (who recommended to herself — unusual).,synthetic
+S369,The author found the inconsistency in the research paper and corrected it before submission.,pronoun,'It' could refer to the inconsistency (what was corrected) or the research paper (which was corrected).,synthetic
+S335,The audit committee told the finance team that they had found significant discrepancies.,pronoun,'They' could refer to the audit committee (who found them) or the finance team (whose records contained them).,synthetic
+S308,After Ravi spoke to Arjun about the results he seemed relieved.,pronoun,'He' could refer to Ravi or Arjun — either could feel relieved.,synthetic
+S344,The researchers told the participants that they needed to complete an additional questionnaire.,pronoun,'They' could refer to the researchers or the participants — either could need to complete it.,synthetic
+S371,The team completed the feature and reported this to the stakeholders in the review.,pronoun,'This' could refer to the completion event or the feature itself.,synthetic
+S372,The system generated an alert and flagged this as a high-severity issue.,pronoun,'This' could refer to the alert or the underlying event that caused it.,synthetic
+S328,The management advised the employees that they needed to improve productivity.,pronoun,'They' could refer to management (who needs to improve something) or employees (who were advised to).,synthetic
+S320,The editor told the writer that her draft needed substantial revision.,pronoun,'Her' could refer to the editor's own draft or the writer's draft.,synthetic
+S387,The senior engineer reviewed the junior engineer's implementation and added his notes.,pronoun,'His' could refer to the senior engineer's notes or the junior engineer's own notes.,synthetic
+S326,The team told the clients that they were responsible for the final testing.,pronoun,'They' could refer to the team or the clients — either could be responsible.,synthetic
+S376,The client cancelled the order and this disrupted the entire delivery schedule.,pronoun,'This' could refer to the cancellation or the order.,synthetic
+S350,The data scientists told the product managers that they had identified a significant model drift.,pronoun,'They' could refer to the data scientists (who found it) or the product managers (who had already flagged it).,synthetic
+S314,When the professor returned the assignment to the student she awarded full marks.,pronoun,'She' could refer to the professor (who awarded marks) or the student (who received them — unusual but grammatical).,synthetic
+S325,After the administrator contacted the vendor she processed the payment.,pronoun,'She' could refer to the administrator or the vendor — either could process a payment.,synthetic
+S304,When David met Michael at the conference he was nervous.,pronoun,'He' could refer to David or Michael — either could be nervous.,synthetic
+S318,After the auditor met the accountant at the branch she issued a formal warning.,pronoun,'She' could refer to the auditor (who issued it) or the accountant (who issued a response).,synthetic
+S339,The vendors told the procurement team that they were unable to meet the revised deadline.,pronoun,'They' could refer to the vendors or the procurement team — either could be unable to meet it.,synthetic
+S309,The supervisor informed the trainee that she had passed the final assessment.,pronoun,'She' could refer to the supervisor (stating a fact) or the trainee (who passed).,synthetic
+S384,The coach advised the athlete to adjust her training schedule before the competition.,pronoun,'Her' could refer to the coach's recommendation or the athlete's schedule — ambiguous referent.,synthetic
+S307,When the teacher returned the paper to the student she asked for clarification.,pronoun,'She' could refer to the teacher (who asked) or the student (who asked).,synthetic
+S370,The manager identified the problem in the project plan and revised it before presenting.,pronoun,'It' could refer to the problem section or the project plan (which was revised).,synthetic
+S337,The professors informed the students that they were required to retake the final exam.,pronoun,'They' could refer to the professors (who must administer a retake) or the students (who must retake it).,synthetic
+S394,The analyst and the data engineer worked on the pipeline and he submitted it for review.,pronoun,'He' could refer to the analyst or the data engineer.,synthetic
+S386,The nurse asked the doctor to reconsider her patient's dosage.,pronoun,'Her' could refer to the nurse's patient or the doctor's patient.,synthetic
+S355,The contractor identified the fault in the wiring and replaced it during maintenance.,pronoun,'It' could refer to the fault (removed) or the wiring (replaced).,synthetic
+S351,The engineer found the defect in the module and fixed it before the release.,pronoun,'It' could refer to the defect (what was fixed) or the module (what was repaired).,synthetic
+S373,The manager rejected the proposal and this surprised the entire development team.,pronoun,'This' could refer to the rejection action or some aspect of the proposal.,synthetic
+S347,The lecturers told the teaching assistants that they were expected to provide detailed feedback.,pronoun,'They' could refer to the lecturers or the teaching assistants — either could be expected to provide feedback.,synthetic
+S403,After the client signed the agreement he forwarded it to his legal team for records.,pronoun,'His' could refer to the client's legal team or the counterparty's legal team.,synthetic
+S364,The developer fixed the memory leak in the background service and restarted it.,pronoun,'It' could refer to the memory leak fix or the background service (which was restarted).,synthetic
+S404,The architect and the contractor disagreed on the timeline and he filed a formal objection.,pronoun,'He' could refer to the architect or the contractor.,synthetic
+S064,The findings suggest a substantial correlation.,vague,'Substantial' has no defined correlation coefficient range.,synthetic
+S042,The company needs to improve its customer service significantly.,vague,'Significantly' has no measurable target.,synthetic
+S097,The instructions should be easy to follow for first-time users.,vague,'Easy to follow' is subjective and audience-dependent.,synthetic
+S019,The configuration process should be simple to follow.,vague,'Simple' is subjective and user-dependent.,synthetic
+S083,All staff must complete relevant compliance training.,vague,'Relevant' training is undefined — which courses are required?,synthetic
+S085,Documentation must be submitted in an appropriate format.,vague,'Appropriate format' is unspecified.,synthetic
+S066,The experiment used a large sample of respondents.,vague,'Large' is relative with no defined sample size.,synthetic
+S044,The new policy should take effect soon.,vague,'Soon' gives no implementation date.,synthetic
+S011,The module must process inputs quickly.,vague,'Quickly' gives no measurable processing-time constraint.,synthetic
+S001,The system should respond quickly.,vague,The word 'quickly' has no measurable threshold — 100 ms or 5 s are both 'quick'.,synthetic
+S033,The project must be completed promptly.,vague,'Promptly' is time-unbound without a specific date.,synthetic
+S077,The patient should avoid strenuous activity for some time.,vague,"'Some time' is undefined — days, weeks, or months?",synthetic
+S049,The quality of work submitted must be acceptable.,vague,'Acceptable' has no defined quality standard.,synthetic
+S028,The access control must be adequately restrictive.,vague,'Adequately' gives no specific permission or rule count.,synthetic
+S046,Employees are expected to maintain a professional attitude.,vague,'Professional attitude' is subjective and context-dependent.,synthetic
+S005,The software must be robust enough to handle edge cases.,vague,'Robust enough' is subjective; what counts as sufficient is unclear.,synthetic
+S024,The data pipeline should run efficiently overnight.,vague,'Efficiently' does not define a runtime or resource cap.,synthetic
+S013,The error messages should be helpful to the user.,vague,'Helpful' is subjective and context-dependent.,synthetic
+S092,The explanation should be clear enough for beginners.,vague,'Clear enough' is subjective and audience-dependent.,synthetic
+S075,Staff must respond to emergencies promptly.,vague,'Promptly' gives no maximum response time.,synthetic
+S051,The review process should not take too long.,vague,'Too long' is undefined — it could mean hours or weeks.,synthetic
+S072,The medication must be taken regularly as prescribed.,vague,'Regularly' is undefined without a specific dosing schedule.,synthetic
+S070,The thesis should demonstrate a reasonable understanding of the topic.,vague,'Reasonable understanding' has no defined competency benchmark.,synthetic
+S016,The test coverage should be sufficient before release.,vague,'Sufficient' gives no percentage threshold.,synthetic
+S041,The product should be delivered at a competitive price.,vague,'Competitive' is relative and market-dependent.,synthetic
+S035,The manager expects the deliverables soon.,vague,'Soon' gives no concrete delivery date.,synthetic
+S010,The codebase must be maintainable.,vague,'Maintainable' is a subjective quality with no defined metric.,synthetic
+S082,The policy should be reviewed and updated regularly.,vague,'Regularly' has no defined review interval.,synthetic
+S012,The platform must support many users simultaneously.,vague,'Many' is undefined — it could mean dozens or millions.,synthetic
+S067,The paper should be clearly written.,vague,'Clearly written' is subjective with no defined readability standard.,synthetic
+S096,We need a better approach for handling this problem.,vague,'Better' is relative with no defined comparison baseline.,synthetic
+S032,The team should communicate regularly about project status.,vague,'Regularly' has no defined frequency or interval.,synthetic
+S030,The application should scale appropriately with traffic growth.,vague,'Appropriately' does not specify scaling thresholds or limits.,synthetic
+S090,The response was somewhat confusing to most readers.,vague,'Somewhat confusing' is subjective with no defined clarity metric.,synthetic
+S006,The interface should be intuitive for all users.,vague,'Intuitive' varies by user background and cannot be objectively measured.,synthetic
+S047,The business case needs to be compelling.,vague,'Compelling' is a subjective judgment with no measurable threshold.,synthetic
+S071,Patients should rest adequately after surgery.,vague,'Adequately' gives no defined rest duration.,synthetic
+S037,The vendor must provide adequate technical support.,vague,'Adequate' is subjective with no defined SLA.,synthetic
+S017,The new feature must perform well under load.,vague,'Well' and 'load' are both undefined quantities.,synthetic
+S074,The treatment should produce noticeable improvement quickly.,vague,'Noticeable' and 'quickly' are both subjective and unmeasured.,synthetic
+S036,The report needs to be comprehensive.,vague,'Comprehensive' does not define required sections or length.,synthetic
+S008,The service should have minimal downtime.,vague,'Minimal' has no agreed numeric target such as 99.9 percent.,synthetic
+S057,A relatively small number of participants completed all sessions.,vague,'Relatively small' has no defined count or percentage.,synthetic
+S029,The output format should be appropriate for downstream tools.,vague,'Appropriate' depends on context not stated in the sentence.,synthetic
+S020,The update should be deployed soon after testing.,vague,'Soon' has no defined time frame.,synthetic
+S081,The organization must comply with applicable data protection regulations.,vague,"'Applicable' regulations are not specified, creating interpretive ambiguity.",synthetic
+S027,The system should recover promptly after a crash.,vague,'Promptly' has no defined recovery-time objective.,synthetic
+S055,The partner must respond to queries promptly.,vague,'Promptly' gives no response-time SLA.,synthetic
+S014,The system must use memory efficiently.,vague,'Efficiently' does not define an upper memory bound.,synthetic
+S026,The service must handle failures gracefully.,vague,'Gracefully' is subjective with no concrete recovery criteria.,synthetic
+S004,The database must be scaled appropriately for the expected load.,vague,'Appropriately' gives no concrete sizing guidance.,synthetic
+S018,The logging mechanism should be comprehensive.,vague,'Comprehensive' does not specify which events must be captured.,synthetic
+S040,The organization must ensure proper onboarding for new hires.,vague,'Proper' onboarding has no defined content or duration.,synthetic
+S009,The deployment pipeline should be efficient.,vague,"'Efficient' does not specify time, cost, or resource limits.",synthetic
+S078,Recovery time varies but is generally expected to be short.,vague,'Short' has no defined duration such as days or weeks.,synthetic
+S007,The system must be secure against common threats.,vague,'Common threats' and the required level of security are both undefined.,synthetic
+S080,Medical records must be updated in a timely manner.,vague,'Timely manner' gives no maximum update delay.,synthetic
+S038,The presentation should make a good impression.,vague,'Good impression' is entirely subjective.,synthetic
+S087,Please submit the report as soon as possible.,vague,'As soon as possible' is relative and depends on context.,synthetic
+S058,The literature review must be extensive.,vague,'Extensive' does not define a required scope or word count.,synthetic
+S100,The client expects a high standard of work throughout the project.,vague,'High standard' is subjective with no defined quality metric.,synthetic
+S056,The study found a significant difference between the two groups.,vague,'Significant' may be statistical or practical — the type is unclear.,synthetic
+S045,The contract requires timely delivery of goods.,vague,'Timely' is undefined without a specific date.,synthetic
+S052,The feedback cycle should be reasonably short.,vague,'Reasonably short' has no defined duration.,synthetic
+S068,The results should be reproducible under similar conditions.,vague,'Similar conditions' is vague — no deviation range is specified.,synthetic
+S048,The project requires a high level of accuracy.,vague,'High level of accuracy' does not define an error rate or metric.,synthetic
+S069,The research question must be appropriately scoped.,vague,'Appropriately scoped' is subjective with no defined criteria.,synthetic
+S063,The methodology should be sufficiently detailed.,vague,'Sufficiently detailed' does not specify a required depth.,synthetic
+S184,She found the letter from the auditor on the conference table.,attachment,'On the conference table' can attach to 'found' (she found it there) or to 'letter' (the letter was on the table — but so is 'found').,synthetic
+S154,The journalist interviewed the protester standing outside the building.,attachment,'Standing outside the building' can modify 'protester' (the protester stood there) or 'journalist' (she stood there during the interview).,synthetic
+S171,He presented the proposal to the committee with the revised figures.,attachment,'With the revised figures' can attach to 'presented' (he brought them to the meeting) or to 'proposal' (the proposal contained the revised figures) — both readings are natural.,synthetic
+S146,The student submitted the form that was due via the online portal.,attachment,'Via the online portal' can attach to 'submitted' (how she submitted) or to 'due' (it was due through the portal).,synthetic
+S145,The coach trained the athletes who had minor injuries on the new field.,attachment,'On the new field' can attach to 'trained' (training happened there) or to 'had minor injuries' (injuries occurred there).,synthetic
+S140,"Stored in the cloud, the administrator could not access the backup locally.",attachment,'Stored in the cloud' can attach to 'backup' (it is stored there) or implies the administrator is in the cloud.,synthetic
+S123,He installed the software with the missing drivers.,attachment,'With the missing drivers' can attach to 'installed' (he found them) or to 'software' (it lacked them).,synthetic
+S181,The suspect was arrested near the school wearing a dark hoodie.,attachment,'Wearing a dark hoodie' can modify 'suspect' (the suspect wore it) or 'officer' (the arresting officer wore it).,synthetic
+S111,The inspector examined the building with the structural assessment.,attachment,'With the structural assessment' can attach to 'examined' (using it as a tool) or to 'building' (it was in the assessment).,synthetic
+S101,She saw the man with the telescope.,attachment,The phrase 'with the telescope' can attach to 'saw' (she used it) or to 'man' (he had it).,synthetic
+S119,The board reviewed the report with the unfavorable projections.,attachment,'With the unfavorable projections' can attach to 'reviewed' (using them) or to 'report' (it contained them).,synthetic
+S131,"Tired after the long meeting, the project was postponed.",attachment,The participial 'Tired after the long meeting' dangles — the project cannot be tired; a person was.,synthetic
+S174,Just the automated tests were run before the hotfix.,attachment,"'Just' can scope over 'the automated tests' (nothing else was run) or over 'were run' (they were only run, not configured or maintained).",synthetic
+S134,"Driven by deadline pressure, the code was merged without testing.",attachment,The participial 'Driven by deadline pressure' dangles — code cannot be driven; the developers were.,synthetic
+S191,Old men and women lined up at the registration desk.,attachment,'Old' can modify only 'men' (old men and unspecified women) or both 'men and women' (all are old).,synthetic
+S105,He interviewed the professor with the new research data.,attachment,'With the new research data' can attach to 'interviewed' (he used it) or to 'professor' (she had it).,synthetic
+S177,He merely updated the title of the document.,attachment,"'Merely' can scope over 'updated' (he did nothing more) or over 'the title' (he only changed the title, not the content).",synthetic
+S178,Only the project lead attended the stakeholder call.,attachment,"'Only' can scope over 'the project lead' (no one else attended) or over 'attended' (the lead only attended, did not present).",synthetic
+S113,The technician replaced the component with the damaged casing.,attachment,'With the damaged casing' can attach to 'replaced' (using a new one) or to 'component' (it had a damaged casing).,synthetic
+S132,"Reviewing the design, several errors were discovered by the team.",attachment,The participial 'Reviewing the design' dangles — the errors did not review; the team did.,synthetic
+S156,They found the note in the drawer left by the previous occupant.,attachment,'Left by the previous occupant' can modify 'note' (she left it) or 'drawer' (the occupant left the drawer).,synthetic
+S189,He reviewed the complaint from the client against the new policy.,attachment,'Against the new policy' can modify 'complaint' (it objected to the policy) or 'reviewed' (he reviewed it in light of the policy).,synthetic
+S127,"Having reviewed the contract, the decision was made to proceed.",attachment,The participial 'Having reviewed' dangles — the decision cannot review; a person did.,synthetic
+S143,The professor lectured the students who had failed the exam on Friday.,attachment,'On Friday' can attach to 'lectured' (the lecture was on Friday) or to 'failed' (they failed on Friday).,synthetic
+S170,He assigned the highest-priority ticket to the engineer that was labeled critical.,attachment,'That was labeled critical' can modify 'ticket' (it had the label) or 'engineer' (unusual).,synthetic
+S116,The manager approved the request with a brief review.,attachment,'With a brief review' can attach to 'approved' (how she approved it) or to 'request' (it included a brief review).,synthetic
+S141,She saw the assistant walking to the conference room from her office.,attachment,'From her office' can attach to 'saw' (she looked from her office) or to 'walking' (the assistant walked from the office).,synthetic
+S197,She shared the update with the clients and partners in the evening briefing.,attachment,'In the evening briefing' can modify 'partners' only or both 'clients and partners'.,synthetic
+S110,The journalist spoke to the scientist with the latest findings.,attachment,'With the latest findings' can attach to 'spoke' (the journalist had them) or to 'scientist' (the scientist had them).,synthetic
+S173,He almost deleted the entire production database.,attachment,'Almost' can modify 'deleted' (he came close to deleting) or 'entire' (he deleted almost all of it).,synthetic
+S112,She greeted the client with the updated contract.,attachment,'With the updated contract' can attach to 'greeted' (she handed it over) or to 'client' (the client brought it).,synthetic
+S148,The analyst reviewed the logs that were incomplete in the morning session.,attachment,'In the morning session' can attach to 'reviewed' (when the review happened) or to 'incomplete' (when they were incomplete).,synthetic
+S186,She sent a message to the manager about the update from her phone.,attachment,'From her phone' can attach to 'sent' (she sent from her phone) or to 'update' (the update originated from her phone).,synthetic
+S129,"Locked in the cabinet, the secretary could not find the files.",attachment,'Locked in the cabinet' can modify 'files' (they were locked) or 'secretary' (she was somehow confined).,synthetic
+S194,They reviewed the flagged entries and records from the last quarter.,attachment,'From the last quarter' can modify only 'records' or both 'entries and records'.,synthetic
+S106,She photographed the girl with the long coat.,attachment,'With the long coat' can attach to 'photographed' (she used a coat-related method) or to 'girl' (the girl wore it).,synthetic
+S167,He sent the file to the team member that contained the revised figures.,attachment,'That contained the revised figures' can modify 'file' (it had them) or 'team member' (unusual).,synthetic
+S166,She forwarded the message to the manager that was marked urgent.,attachment,'That was marked urgent' can modify 'message' (it was urgent) or 'manager' (unusual).,synthetic
+S136,"Confused by the interface, the form was filled out incorrectly.",attachment,The participial 'Confused by the interface' dangles — the form cannot be confused; the user was.,synthetic
+S117,He identified the student with the highest score.,attachment,'With the highest score' can attach to 'identified' (using the score as criterion) or to 'student' (who achieved it).,synthetic
+S150,The nurse attended to the patient who arrived in the treatment area.,attachment,'In the treatment area' can attach to 'attended' (where care was given) or to 'arrived' (where the patient appeared).,synthetic
+S135,"Damaged during shipping, the client reported the equipment to the vendor.",attachment,'Damaged during shipping' can attach to 'equipment' (it was damaged) or to 'client' (she was affected by damage).,synthetic
+S108,He found the report with the missing figures.,attachment,'With the missing figures' can attach to 'found' (he noticed them) or to 'report' (the report lacked them).,synthetic
+S196,The developer pushed the fix to the repository and tagged it as the latest stable release.,attachment,'Latest stable release' scopes over 'fix' (the fix is the release) or over 'repository' (unusual tag target).,synthetic
+S128,"Looking through the window, the storm seemed to be approaching.",attachment,The participial 'Looking through the window' dangles — the storm cannot look; an implicit person did.,synthetic
+S120,He studied the map with the revised borders.,attachment,'With the revised borders' can attach to 'studied' (how he studied) or to 'map' (it showed them).,synthetic
+S182,She identified the user with the expired token in the logs.,attachment,'In the logs' can attach to 'identified' (she found it in logs) or to 'expired token' (the token appeared in logs).,synthetic
+S126,"Running down the stairs, the documents fell from the folder.",attachment,The participial 'Running down the stairs' dangles — it should modify a person but the subject is 'documents'.,synthetic
+S163,They approved the candidate from the shortlist that was recommended by the panel.,attachment,'That was recommended by the panel' can modify 'shortlist' (the panel recommended it) or 'candidate' (the panel recommended them).,synthetic
+S114,He discussed the issue with the senior developer from the London office.,attachment,'From the London office' can attach to 'developer' (based there) or to 'discussed' (they discussed in London).,synthetic
+S125,The engineer tested the circuit with the faulty readings.,attachment,'With the faulty readings' can attach to 'tested' (using the readings) or to 'circuit' (it produced them).,synthetic
+S104,The officer stopped the driver with a warning light.,attachment,'With a warning light' can attach to 'stopped' (the officer used it) or to 'driver' (the driver had one).,synthetic
+S118,She located the document with the final signature.,attachment,'With the final signature' can attach to 'located' (using the signature as identifier) or to 'document' (it had the signature).,synthetic
+S139,"Found near the entrance, the officer secured the suspicious package.",attachment,'Found near the entrance' can attach to 'package' (it was found there) or to 'officer' (she found it there).,synthetic
+S109,She met the supervisor with the quarterly results.,attachment,'With the quarterly results' can attach to 'met' (she brought them) or to 'supervisor' (the supervisor had them).,synthetic
+S179,She nearly completed all the required steps.,attachment,'Nearly' can scope over 'completed' (she almost finished) or over 'all' (she completed almost all but not every step).,synthetic
+S107,The team reviewed the proposal with the revised timeline.,attachment,'With the revised timeline' can attach to 'reviewed' (using it as reference) or to 'proposal' (it contained the timeline).,synthetic
+S165,He found the key inside the box that opened the storage room.,attachment,'That opened the storage room' can modify 'key' (it opens the room) or 'box' (the box is in the storage room — unusual).,synthetic
+S137,"Built on an unstable foundation, the architect warned about the structure.",attachment,'Built on an unstable foundation' can attach to 'structure' (it was built that way) or to 'architect' (she built it).,synthetic
+S190,They signed the contract with the supplier for the new office.,attachment,'For the new office' can attach to 'contract' (it covers the new office) or to 'supplier' (the supplier serves the new office).,synthetic
+S157,She sent the email about the meeting to the wrong department.,attachment,'About the meeting' can attach to 'email' (the email's topic) or to 'sent' (she sent it in the context of the meeting).,synthetic
+S200,The photographer captured the athlete and the coach celebrating on the field.,attachment,'On the field' can modify 'celebrating' (where they celebrated) or 'captured' (where the photo was taken).,synthetic
+S155,She watched the children playing near the fountain in the square.,attachment,'In the square' can attach to 'playing' (location of play) or to 'watched' (where she stood).,synthetic
+S144,She handed the documents to the clerk who was serving another customer at the window.,attachment,'At the window' can attach to 'serving' (the clerk served there) or to 'handed' (she handed them at the window).,synthetic
+S151,I saw the manager talking to the client in the hallway.,attachment,'In the hallway' can attach to 'saw' (I was in the hallway) or to 'talking' (they talked there).,synthetic
+S168,They escalated the complaint to the department that had not been resolved.,attachment,'That had not been resolved' can modify 'complaint' (it was unresolved) or 'department' (it had not resolved it).,synthetic
+S147,The engineer repaired the system that had failed in the control room.,attachment,'In the control room' can attach to 'repaired' (location of repair) or to 'failed' (location of failure).,synthetic
+S169,She presented the report to the board that was compiled over three months.,attachment,'That was compiled over three months' can modify 'report' (it took that long) or 'board' (unusual).,synthetic
+S162,He returned the device to the supplier that was still under warranty.,attachment,'That was still under warranty' can modify 'device' (it had warranty) or 'supplier' (unusual reading).,synthetic
+S198,He approved the design changes and the budget adjustments from the revised proposal.,attachment,'From the revised proposal' can modify only 'budget adjustments' or both 'design changes and budget adjustments'.,synthetic
+S264,Users cannot view or modify records belonging to other accounts.,scope,Cannot do either action (both prohibited) OR cannot do at least one of them.,synthetic
+S242,She just added a paragraph to the introduction of the report.,scope,"'Just' can scope over 'added a paragraph' (a minimal change) or over 'introduction' (only the introduction was changed, not other sections).",synthetic
+S297,All system event logs are not retained beyond the 30-day retention window.,scope,Can mean no logs are retained beyond 30 days or not all logs are retained that long.,synthetic
+S219,Not all users have been successfully migrated to the new platform.,scope,Can mean some users remain unmigrated or no users have migrated successfully.,synthetic
+S284,Candidates should provide two references or a portfolio of relevant work.,scope,Each candidate may provide either (individual choice) OR all must provide one designated item.,synthetic
+S286,The system generates a notification by email or by push message.,scope,Each notification uses one or the other (exclusive OR) OR the system may send both (inclusive OR).,synthetic
+S266,Staff should not bypass the approval workflow or the compliance audit.,scope,Should not bypass either (both must be followed) OR should not bypass at least one.,synthetic
+S244,They merely applied a configuration patch to resolve the reported issue.,scope,"'Merely' can scope over 'applied' (a minimal intervention) or over 'configuration patch' (a minor fix, not a code change).",synthetic
+S211,All requests were not processed within the expected time window.,scope,Can mean no requests were processed on time or not all requests were processed on time.,synthetic
+S201,Every student did not submit the assignment.,scope,Can mean no student submitted (universal negation) or not every student submitted (partial negation).,synthetic
+S233,She only contacted the helpdesk on two occasions last month.,scope,"'Only' can scope over 'two occasions' (no more than twice) or over 'contacted' (she only contacted, did not escalate).",synthetic
+S278,Every team member completed the security training and the skills assessment.,scope,Did each member complete both individually or did the group collectively complete both programs?,synthetic
+S249,Only users with administrator privileges should access the control panel.,scope,"'Only' can scope over 'users with administrator privileges' (no others should access) or over 'access' (they should only access, not modify).",synthetic
+S228,Every employee must complete the training or sign the waiver.,scope,Each employee may do either (individual) OR all must collectively do one (group requirement).,synthetic
+S246,She just acknowledged receipt of the complaint without investigating further.,scope,"'Just' can scope over 'acknowledged receipt' (minimal action) or over 'complaint' (only the complaint was acknowledged, not the related issue).",synthetic
+S205,Every team member did not attend the sprint review.,scope,Can mean no member attended or not all members attended (some missed it).,synthetic
+S223,Each team member should review the code or run the tests.,scope,Scope of 'each' over 'or': individual free choice vs. the group must do one task collectively.,synthetic
+S213,She did not submit the form or the supporting documents.,scope,Can mean she submitted neither or that at least one was not submitted.,synthetic
+S293,Every reported incident was not escalated to the senior response team.,scope,Can mean no incident was escalated or not every incident was escalated.,synthetic
+S276,All divisions reviewed the budget proposal and the staffing requirements.,scope,Each division reviewed both (distributive) vs. collectively the divisions covered both items (collective).,synthetic
+S251,Some teams did not reach their quarterly performance targets.,scope,Scope of negation over existential: some teams failed OR none of the teams reached their targets.,synthetic
+S272,Every reviewer read the manuscript and submitted their evaluation.,scope,"Did every reviewer do both individually, or did the group collectively accomplish both tasks?",synthetic
+S270,Administrators must not grant elevated access without authorization and documentation.,scope,"Scope of 'without': both must be present to grant access, or either one alone is sufficient.",synthetic
+S216,Every question on the exam was not answered correctly.,scope,Can mean no question was answered correctly or not every question was correct.,synthetic
+S241,Only the first version of the document was reviewed by the committee.,scope,'Only' can scope over 'first version' (no later version was reviewed) or over 'reviewed' (it was reviewed but not edited).,synthetic
+S235,Only the system administrator can change the firewall rules.,scope,"'Only' can scope over 'system administrator' (no one else can change them) or over 'change' (the admin can only change, not delete).",synthetic
+S210,Not every module in the system needs to be redesigned.,scope,Can mean some modules need redesigning or no module needs to be redesigned.,synthetic
+S283,Users may contact the support team by email or through the online portal.,scope,Each user may choose either channel OR all users are limited to one designated channel.,synthetic
+S212,Every sensor did not record the correct temperature reading.,scope,Can mean no sensor recorded correctly or not every sensor recorded correctly.,synthetic
+S267,The module must not skip the input validation or the audit logging step.,scope,Must not skip either step OR must not skip at least one of them.,synthetic
+S296,Only a small subset of the submitted datasets were accepted for analysis.,scope,"'Only' can scope over 'small subset' (emphasizing smallness) or over 'accepted' (they were only accepted, not processed).",synthetic
+S232,Just the team leader signed off on the production deployment.,scope,"'Just' can scope over 'team leader' (no one else signed off) or over 'signed off' (the leader only signed off, took no other action).",synthetic
+S230,Each partner must agree to the revised terms or the original contract.,scope,"Each partner may choose either version, OR all must agree on one document collectively.",synthetic
+S291,Not every configuration change triggers an automatic service restart.,scope,Can mean some changes do trigger a restart (partial) or no changes trigger one (universal negation).,synthetic
+S206,Not all configurations have been tested on the new server.,scope,Can mean some are untested or all have not been tested at all.,synthetic
+S247,He only approved the initial proposal out of the four submitted options.,scope,"'Only' can scope over 'initial proposal' (one out of four was approved) or over 'approved' (he only approved, did not modify).",synthetic
+S271,All departments reviewed the updated policy and the implementation guide.,scope,Distributive (each department reviewed both) vs. collective (the departments together covered both items).,synthetic
+S237,She only escalated the ticket to her direct supervisor.,scope,'Only' can scope over 'direct supervisor' (no one else was informed) or over 'escalated' (she escalated but took no other action).,synthetic
+S217,Not every participant completed the survey or the follow-up interview.,scope,Can mean some participants skipped both or not every participant finished at least one.,synthetic
+S274,Each applicant signed the consent form and the confidentiality agreement.,scope,Did each applicant sign both documents individually or did the group collectively execute both?,synthetic
+S236,Just one reviewer raised an objection during the design walkthrough.,scope,"'Just' can scope over 'one reviewer' (exactly one person objected) or over 'raised' (the reviewer only raised an objection, did nothing else).",synthetic
+S208,The manager did not approve the budget or the staffing plan.,scope,Can mean neither was approved or at least one was not approved.,synthetic
+S257,Few candidates advanced past the initial screening round.,scope,'Few' is ambiguous in scope — it may mean almost none or a specific small number that varies by context.,synthetic
+S229,All candidates must submit a portfolio or a letter of recommendation.,scope,"Each candidate may choose either, OR the entire applicant pool must submit one type.",synthetic
+S220,Every line of code was not reviewed before the deployment.,scope,Can mean no line was reviewed or not every line was reviewed.,synthetic
+S282,Participants can submit their work as a written report or a recorded presentation.,scope,Each participant may choose either format (individual) OR all must use one format (collective requirement).,synthetic
+S227,Each component must pass the unit test or the integration test.,scope,Each component needs at least one passing test (individual) OR all must pass a designated test (collective).,synthetic
+S255,Some employees have not yet completed the mandatory compliance training.,scope,Can mean a subset is non-compliant or the sentence is ambiguous about how many.,synthetic
+S214,Not all bugs identified in testing have been fixed in this release.,scope,Can mean some bugs remain unfixed or no bugs have been fixed at all.,synthetic
+S226,All divisions must approve the proposal or the alternative plan.,scope,"Each division may approve either, OR all must approve one document as a group.",synthetic
+S204,All employees should not work overtime this week.,scope,Can mean no employees should work overtime or not all employees should (some may).,synthetic
+S218,He did not read the report and the appendix carefully.,scope,Can mean he read neither carefully or he did not read both carefully.,synthetic
+S240,Just the regression tests were executed before the emergency release.,scope,"'Just' can scope over 'regression tests' (no other tests ran) or over 'executed' (they were only executed, not analyzed).",synthetic
+S209,They never submitted the report or the presentation slides.,scope,Can mean neither was submitted or at least one was never submitted.,synthetic
+S279,All candidates submitted their portfolio and a statement of intent.,scope,Each candidate submitted both (distributive) or collectively the candidates submitted the documents (collective).,synthetic
+S207,He never said he was planning to leave the company.,scope,Scope of 'never' is over 'said' (he never made the statement) or embedded (he said he'd never plan to leave).,synthetic
+S281,Employees may complete the certification online or at a testing center.,scope,Each employee may choose either method (individual choice) OR all employees must use one designated method.,synthetic
+S238,He merely glanced at the agreement before appending his signature.,scope,"'Merely' can scope over 'glanced' (a minimal look) or over 'the agreement' (he glanced at it, not the exhibits).",synthetic
+S288,Reviewers may approve or request changes on the submitted pull request.,scope,Exclusive choice (one action per review) OR both actions are allowed together.,synthetic
+S258,Several defects were not resolved before the product was shipped.,scope,Can mean some defects remain open or specifically several named defects were not fixed.,synthetic
+S300,All users did not confirm their email address after the platform migration.,scope,Can mean no user confirmed or not all users confirmed their email.,synthetic
+S256,Many users did not receive the system notification after the update.,scope,"Scope of negation: many users lacked the notification, OR not many users received it.",synthetic
+S245,Only the default settings were validated before the product was shipped.,scope,'Only' can scope over 'default settings' (custom settings were not checked) or over 'validated' (they were validated but not stress-tested).,synthetic
+S252,A few reports were not submitted before the agreed deadline.,scope,Can mean some reports missed the deadline or none of the few reports were submitted on time.,synthetic
+S268,Developers cannot push directly to the main branch or the release branch.,scope,Cannot push to either branch OR cannot push to at least one of them.,synthetic
+S248,They merely added a log statement to the failing test case.,scope,'Merely' can scope over 'added a log statement' (a trivial change) or over 'failing test case' (only that test was touched).,synthetic
+S269,The server must not be restarted during active user sessions or scheduled jobs.,scope,Must not restart during either situation OR must not restart during at least one.,synthetic
+S263,The team must not merge code without a passing review and sign-off.,scope,"Scope of 'without': missing either requirement blocks merging, or both must be absent simultaneously.",synthetic
+S491,"The patient wristband displays full name, date of birth, and hospital ID number.",no_ambiguity,Specific artifact and enumerated fields; unambiguous.,synthetic
+S461,Insert the USB drive into the port on the right side of the laptop.,no_ambiguity,Specific device and location; one reading.,synthetic
+S478,Pull request number 312 was merged into main by Shaik on Tuesday at 11:42 AM.,no_ambiguity,"Specific PR number, branch, actor, day, and time; one reading.",synthetic
+S453,Push all code changes to a feature branch and open a pull request targeting main.,no_ambiguity,Specific branch naming and workflow step; one interpretation.,synthetic
+S452,Run pip install -r requirements.txt in the project root to install all dependencies.,no_ambiguity,Exact command and directory; unambiguous.,synthetic
+S447,The temperature sensor records a reading every five minutes and stores it in Cloud Storage.,no_ambiguity,Exact interval and destination; unambiguous.,synthetic
+S430,"The meeting is scheduled for Monday, November 4th at 10:00 AM in Room 3B.",no_ambiguity,"Fully specified date, time, and location; one reading.",synthetic
+S488,The second-floor fire exit is at the far end of the east corridor.,no_ambiguity,"Specific floor, direction, and location; one reading.",synthetic
+S418,The deployment pipeline must run all unit tests before releasing to staging.,no_ambiguity,Clear sequence with no modifier attachment ambiguity.,synthetic
+S408,The server must respond within 200 milliseconds.,no_ambiguity,Precise measurable threshold; exactly one interpretation is possible.,synthetic
+S426,All form inputs must be validated on the client side before the API call is made.,no_ambiguity,Specific location and sequence; one interpretation.,synthetic
+S438,"The company was founded in 2012 and currently employs 3,200 full-time staff.",no_ambiguity,Specific year and headcount; unambiguous.,synthetic
+S481,The diagram on page 12 shows the data flow between the React frontend and the Node backend.,no_ambiguity,Specific page and technologies; unambiguous.,synthetic
+S441,The server was restarted at 3:15 AM on Saturday by the on-call engineer.,no_ambiguity,"Specific time, day, and actor; one interpretation.",synthetic
+S498,The function returns a list of strings sorted in ascending alphabetical order.,no_ambiguity,Specific return type and sort order; one interpretation.,synthetic
+S412,The API must return a 200 status code for all successful GET requests.,no_ambiguity,Precise condition and outcome; unambiguous.,synthetic
+S484,The requirements.txt file lists all Python packages needed to run this project.,no_ambiguity,Specific file name and purpose; one reading.,synthetic
+S485,The function on line 34 converts the input string to lowercase before tokenization.,no_ambiguity,Specific line and transformation; unambiguous.,synthetic
+S420,All API endpoints must require authentication using a valid JWT token.,no_ambiguity,Specific technology and requirement; unambiguous.,synthetic
+S439,The package was shipped on Tuesday and delivered to the recipient on Thursday.,no_ambiguity,Clear sequential events with specific days; one reading.,synthetic
+S463,Compress all source files into a single ZIP archive before uploading.,no_ambiguity,Specific format and precondition; one interpretation.,synthetic
+S496,The release notes for version 2.3.1 are in the CHANGELOG.md file in the repository root.,no_ambiguity,Specific version and file location; one reading.,synthetic
+S434,Python 3.11 is required to run the preprocessing scripts in this repository.,no_ambiguity,Exact version and purpose; unambiguous.,synthetic
+S450,Press Ctrl+S to save and Ctrl+Z to undo the last edit.,no_ambiguity,Specific key bindings and actions; unambiguous.,synthetic
+S477,The orange cable connects the router to the modem and must not connect to the laptop.,no_ambiguity,Specific color and devices; unambiguous.,synthetic
+S423,The monthly report must be submitted by 5:00 PM on the last Friday of each month.,no_ambiguity,"Precise deadline with day, time, and recurrence specified.",synthetic
+S448,"To reset your password, click the Forgot Password link on the login page.",no_ambiguity,Specific action and location; one clear interpretation.,synthetic
+S504,The conference registration deadline is November 30th at 11:59 PM in the organizer's time zone.,no_ambiguity,"Exact date, time, and time zone reference; one reading.",synthetic
+S417,The error rate must not exceed 0.1 percent in any rolling 24-hour window.,no_ambiguity,Precise threshold and window; unambiguous.,synthetic
+S480,The folder named archives contains all datasets collected between 2020 and 2023.,no_ambiguity,Specific folder name and date range; one reading.,synthetic
+S419,User sessions must expire after 30 minutes of inactivity.,no_ambiguity,Exact duration; only one reading.,synthetic
+S455,Sign the document on page 8 where indicated and return it by recorded post.,no_ambiguity,Specific page and delivery method; unambiguous.,synthetic
+S493,Pure water freezes at exactly 0 degrees Celsius at standard atmospheric pressure.,no_ambiguity,Exact physical value with stated conditions; unambiguous.,synthetic
+S436,The office is located on the fourth floor of Building A at 22 Tech Park Road.,no_ambiguity,"Exact location with floor, building, and address; unambiguous.",synthetic
+S501,"The users table has five columns: id, full_name, email, created_at, and account_status.",no_ambiguity,Exact column count and enumerated names; unambiguous.,synthetic
+S413,All passwords must be at least 12 characters and include one special character.,no_ambiguity,"Specific, measurable, conjunction is clear.",synthetic
+S474,The username field accepts only lowercase letters and digits up to 20 characters.,no_ambiguity,Specific character types and length limit; one reading.,synthetic
+S473,The green LED on the front panel indicates that the device is powered on and connected.,no_ambiguity,Specific indicator and meaning; unambiguous.,synthetic
+S443,"The quarterly review is held on the first Monday of January, April, July, and October.",no_ambiguity,Explicit months and day rule; no room for alternative reading.,synthetic
+S424,The service must achieve 99.9 percent uptime measured over each calendar month.,no_ambiguity,Specific metric and measurement window; unambiguous.,synthetic
+S457,Tag the release as v1.0.0 in Git and publish the CHANGELOG before deploying.,no_ambiguity,Specific version tag and ordered steps; unambiguous.,synthetic
+S442,The invoice is due within 30 calendar days of the delivery confirmation date.,no_ambiguity,Precise term and trigger; unambiguous.,synthetic
+S415,Application logs must be retained for exactly 90 days.,no_ambiguity,Precise duration; no ambiguity.,synthetic
+S503,The product is covered by a one-year warranty against manufacturing defects from the date of purchase.,no_ambiguity,"Specific duration, scope, and start event; unambiguous.",synthetic
+S435,"The model was trained on 50,000 labeled examples using supervised fine-tuning.",no_ambiguity,Specific count and method; one interpretation.,synthetic
+S427,The file upload limit is 25 megabytes per individual file.,no_ambiguity,Exact size and scope; unambiguous.,synthetic
+S489,The left instrument cluster displays current speed and fuel level.,no_ambiguity,Specific location and enumerated content; unambiguous.,synthetic
+S433,"The team consists of five members: Shaik, Chaitu, Rajiv, Sudharshan, and Aman.",no_ambiguity,Enumerated list with exact count; no ambiguity.,synthetic
+S470,The access card with the yellow sticker opens the server room on the second floor.,no_ambiguity,Specific identifier and location; one reading.,synthetic
+S421,Container images must be scanned for vulnerabilities before promotion to production.,no_ambiguity,Clear ordered steps; no ambiguity.,synthetic
+S432,The system stores all user data in an encrypted PostgreSQL database hosted on AWS.,no_ambiguity,Specific technology stack and location; one reading.,synthetic
+S411,"The system must support at least 10,000 concurrent users.",no_ambiguity,Exact numeric lower bound; one reading only.,synthetic
+S425,The cache must be invalidated whenever the underlying data record changes.,no_ambiguity,Clear trigger condition; no structural ambiguity.,synthetic
+S446,The deployment completed in 12 minutes with no errors and no rollbacks.,no_ambiguity,Precise duration and outcomes; one reading.,synthetic
+S416,The main branch requires at least two reviewer approvals before merging.,no_ambiguity,Exact count; clear precondition.,synthetic
+S486,"The three rings in the logo represent innovation, collaboration, and integrity.",no_ambiguity,Exact count and enumerated meaning; one interpretation.,synthetic
+S414,The CI build must complete in under five minutes.,no_ambiguity,Exact time bound; only one interpretation.,synthetic
+S472,The first column in the spreadsheet contains unique customer identifiers.,no_ambiguity,Specific column position and content type; one reading.,synthetic
+S444,"The student submitted three deliverables: a literature review, a data analysis, and a final report.",no_ambiguity,Enumerated list with exact count; unambiguous.,synthetic
+S497,The two-factor authentication code expires 10 minutes after it is generated.,no_ambiguity,Exact expiry duration and trigger; unambiguous.,synthetic
+S464,Set the connection timeout to 30 seconds in the application configuration file.,no_ambiguity,Exact value and location; unambiguous.,synthetic
+S507,The sorting algorithm runs in O(n log n) time and requires O(n) additional space.,no_ambiguity,Standard complexity notation; one reading.,synthetic
+S462,Enter the six-digit verification code sent to your registered phone number.,no_ambiguity,Exact code length and delivery channel; unambiguous.,synthetic
+S451,Submit the completed form to Room 201 before 3:00 PM on Friday.,no_ambiguity,"Specific location, deadline, and day; one reading.",synthetic
+S458,"Fill in your full name, date of birth, and student ID on the first page of the form.",no_ambiguity,Three specific fields and location; no ambiguity.,synthetic
+S475,The checkbox labeled I agree to the terms must be selected before the form can be submitted.,no_ambiguity,Specific labeled element and precondition; unambiguous.,synthetic
+S454,Back up the database before applying any schema migration script.,no_ambiguity,Clear ordered steps; no attachment or scope ambiguity.,synthetic
+S476,The error on line 47 indicates a missing semicolon in the JavaScript file.,no_ambiguity,Specific line number and error type; one reading.,synthetic
+S469,The 15-inch laptop on the desk belongs to the software engineer in the corner office.,no_ambiguity,Specific size and location; the modifier chain is unambiguous.,synthetic
+S505,The left sidebar contains navigation links and the main area on the right displays the content.,no_ambiguity,Specific layout regions and their content; unambiguous.,synthetic
