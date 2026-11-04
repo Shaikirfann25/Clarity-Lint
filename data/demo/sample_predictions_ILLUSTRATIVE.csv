@@ -1,11 +1,11 @@
 sentence_id,text,gold_label,rules_pred,model_pred,prompt_pred
-D001,The service returns HTTP 200 within 500 milliseconds.,no_ambiguity,no_ambiguity,no_ambiguity,no_ambiguity
-D002,The supplier shall respond soon.,vague,vague,vague,vague
-D003,The admin monitors the user with the sensor.,attachment,no_ambiguity,attachment,attachment
-D004,The system does not notify all users and administrators.,scope,scope,scope,no_ambiguity
-D005,When the analyst met the manager, they approved the report.,pronoun,pronoun,pronoun,pronoun
-D006,The endpoint must return a JSON response.,no_ambiguity,vague,no_ambiguity,no_ambiguity
-D007,The team should review the request regularly.,vague,vague,no_ambiguity,vague
-D008,The auditor inspected the records with a checklist.,attachment,attachment,attachment,no_ambiguity
-D009,The platform does not store passwords in plain text.,no_ambiguity,no_ambiguity,no_ambiguity,no_ambiguity
-D010,The manager told the engineer that they must update the service.,pronoun,pronoun,no_ambiguity,pronoun
+D001,"The service returns HTTP 200 within 500 milliseconds.",no_ambiguity,no_ambiguity,no_ambiguity,no_ambiguity
+D002,"The supplier shall respond soon.",vague,vague,vague,vague
+D003,"The admin monitors the user with the sensor.",attachment,no_ambiguity,attachment,attachment
+D004,"The system does not notify all users and administrators.",scope,scope,scope,no_ambiguity
+D005,"When the analyst met the manager, they approved the report.",pronoun,pronoun,pronoun,pronoun
+D006,"The endpoint must return a JSON response.",no_ambiguity,vague,no_ambiguity,no_ambiguity
+D007,"The team should review the request regularly.",vague,vague,no_ambiguity,vague
+D008,"The auditor inspected the records with a checklist.",attachment,attachment,attachment,no_ambiguity
+D009,"The platform does not store passwords in plain text.",no_ambiguity,no_ambiguity,no_ambiguity,no_ambiguity
+D010,"The manager told the engineer that they must update the service.",pronoun,pronoun,no_ambiguity,pronoun

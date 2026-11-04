@@ -1,15 +1,52 @@
-﻿node_modules/
-.next/
-out/
-dist/
-build/
-coverage/
+# Virtual Environment
 .venv/
 venv/
+ENV/
+env/
+
+# Python cache & bytecode
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment Variables & Secrets
 .env
 .env.local
 .env.*.local
+*.pem
+*.key
+
+# Editor & IDE settings
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Operating System files
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Output & build artifacts
+dist/
+build/
+*.egg-info/
+logs/
+*.log
+
+
+# Model weights (255 MB — too large for GitHub; regenerate via src/model/train_classifier.py)
+models/distilbert_clarity_lint/model.safetensors
+models/distilbert_clarity_lint/checkpoints/
+
+# HuggingFace hub cache
+.cache/
+
+# Next.js frontend
+web/node_modules/
+web/.next/
+web/out/
