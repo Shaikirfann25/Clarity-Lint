@@ -1,116 +1,96 @@
-"""Pronoun ambiguity detection module for Clarity Lint.
+"""Pronoun/reference ambiguity: flag a pronoun only when it has TWO OR MORE
+plausible antecedents earlier in the same sentence.
 
-Detects pronouns (he, she, it, they, this, his, her, their) that do not refer
-unambiguously to a single obvious antecedent in the sentence.
+Candidate antecedents are determiner noun phrases ("the server", "a request").
+Compatibility is a cheap heuristic:
+  it / its            -> singular, non-person nouns
+  they / them / their -> plural-looking nouns (ending in -s)
+  he/him/his/she/her  -> person/role nouns (user, admin, manager, ...)
+
+Limits: single-sentence only (no cross-sentence antecedents), no parser, so
+compound nouns and unusual head nouns can be mis-read. Not every pronoun is
+flagged: one candidate, or none, means no flag.
 """
-
 import re
-from typing import Any
+from typing import Dict, List
 
-PRONOUN_PATTERNS: list[tuple[str, str]] = [
-    # Plural report / instruction with 'they' / 'their' / 'them':
-    (
-        r"\bThe\s+([a-z ]+?)\s+(?:informed|notified|told|warned|asked|briefed|instructed|explained to|advised)\s+(?:the\s+)?([a-z ]+?)\s+that\s+(they|their|them)\b",
-        "Pronoun '{span}' could refer to either '{role1}' or '{role2}'."
-    ),
-    (
-        r"\b(?:engineers|managers|coordinators|investors|founders|regulators|executives|professors|students|designers|developers|testers|contractors|owners|lecturers|assistants|directors|supervisors|representatives|consultants|clients|team|board|analysts|parents|teachers)\b.*?\b(?:informed|notified|told|warned|asked|briefed|instructed|expressed concerns to)\b.*?\b(they|their|them)\b",
-        "Pronoun '{span}' could refer to either the reporting party or the receiving party."
-    ),
-    # Temporal / conditional clause with two proper nouns or roles + gendered pronoun:
-    (
-        r"\b(?:When|After)\s+(?:the\s+)?([A-Z][a-z]+(?:\s+[a-z]+)?)\s+(?:called|emailed|briefed|met|contacted|visited|spoke to|signed|reported|returned the [a-z]+ to)\s+(?:the\s+)?([A-Z][a-z]+(?:\s+[a-z]+)?).*?\b(she|he|her|his)\b",
-        "Pronoun '{span}' has two plausible antecedent candidates ('{ant1}' and '{ant2}')."
-    ),
-    # Two roles coordinated: "The [Role1] and the [Role2] ... and (he|she) ..."
-    (
-        r"\bThe\s+([a-z ]+?)\s+and\s+(?:the\s+)?([a-z ]+?)\s+(?:disagreed|worked|reviewed|met|debated).*?\b(he|she|his|her)\b",
-        "Pronoun '{span}' could refer to either '{role1}' or '{role2}'."
-    ),
-    # Two roles in interaction:
-    (
-        r"\bThe\s+([a-z ]+?)\s+(?:spoke with|met with|talked to|presented the findings to|told|asked|questioned|advised|informed)\s+(?:the\s+)?([a-z ]+?).*?\b(he|she|his|her)\b",
-        "Pronoun '{span}' has ambiguous reference between '{role1}' and '{role2}'."
-    ),
-    # Dual inanimate nouns + 'it':
-    (
-        r"\b(?:found|discovered|identified|detected|marked|reviewed|built|created|extracted|fixed|re-ran|deleted)\b.*?\bthe\s+([a-z_\-]+)\s+(?:in|for|from|of|on)\s+the\s+([a-z_\-]+)\b.*?\band\b.*?\b(it)\b",
-        "Pronoun 'it' could refer to either '{noun1}' or '{noun2}'."
-    ),
-    (
-        r"\bThe\s+([a-z_\-]+)\s+and\s+the\s+([a-z_\-]+)\b.*?\band\b.*?\b(it|this)\b",
-        "Pronoun '{span}' can ambiguously refer to either of the two previously mentioned items."
-    ),
-    # Inanimate 'it' in multi-clause action:
-    (
-        r"\b(?:damage in the component|broken component in the device|memory leak in the background service|attachment in the email message)\b.*?\b(it)\b",
-        "Pronoun 'it' could refer to the defect or the host component."
-    ),
-    (
-        r"\bThe\s+board\s+approved\s+the\s+strategy\s+and\s+the\s+CEO\s+announced\s+(it)\b",
-        "Pronoun 'it' could refer to the strategy or the board's approval."
-    ),
-    (
-        r"\b(it\s+still\s+failed|it\s+failed)\b",
-        "Pronoun 'it' could refer to the fix, the defect, or the test suite."
-    ),
-    # Possession ambiguity:
-    (
-        r"\b(?:The\s+[a-z ]+)\s+(?:returned|questioned|reviewed|asked|forwarded|advised)\s+(?:the\s+[a-z ]+?'s?\s+[a-z ]+?).*?\b(his|her)\s+[a-z]+\b",
-        "Possessive pronoun '{span}' can ambiguously refer to either person in the sentence."
-    ),
-    (
-        r"\b(?:asked\s+the\s+[a-z ]+?\s+to\s+update\s+(his|her)\s+model)",
-        "Possessive pronoun '{span}' can ambiguously refer to the director or the analyst."
-    ),
-    # Sentential 'this':
-    (
-        r"\b(?:and\s+this|communicated\s+this|reported\s+this|flagged\s+this)\s+(?:delayed|confused|surprised|blocked|complicated|prevented|disrupted|to|as)\b",
-        "Demonstrative pronoun 'this' has unclear reference between the preceding event and the preceding noun."
-    ),
-]
+from .common import make_detection
+
+_PRONOUN = re.compile(r"\b(?:it|its|they|them|their|theirs|he|him|his|she|her)\b", re.IGNORECASE)
+_NP = re.compile(r"\b(?:the|a|an|each|every)\s+([A-Za-z][A-Za-z-]*)(?:\s+([A-Za-z][A-Za-z-]*))?",
+                 re.IGNORECASE)
+
+_PERSON = {
+    "user", "users", "admin", "admins", "administrator", "administrators",
+    "manager", "managers", "customer", "customers", "client", "clients",
+    "employee", "employees", "developer", "developers", "tester", "testers",
+    "operator", "operators", "supplier", "suppliers", "vendor", "vendors",
+    "buyer", "buyers", "seller", "sellers", "tenant", "tenants", "landlord",
+    "contractor", "contractors", "party", "parties", "doctor", "doctors",
+    "patient", "patients", "officer", "officers", "owner", "owners",
+    "teacher", "teachers", "student", "students", "engineer", "engineers",
+    "auditor", "auditors", "reviewer", "reviewers", "member", "members",
+}
+_ADJ_SKIP = {
+    "new", "old", "same", "other", "first", "last", "next", "previous",
+    "current", "valid", "invalid", "active", "inactive", "main", "primary",
+    "secondary", "additional", "relevant", "applicable", "original",
+    "existing", "final", "initial", "second", "third", "large", "small",
+    "high", "low", "available", "authorized", "unauthorized", "registered",
+    "secure", "encrypted", "senior", "junior", "external", "internal",
+}
+_NOT_NOUN = {"following", "above", "below", "only", "least", "most", "such",
+             "same", "other", "first", "last", "next", "previous"}
+
+_EXPLETIVE = re.compile(
+    r"^\s+(?:is|was|will be|shall be|should be|may be|might be|must be|has been)\s+"
+    r"(?:(?:not|also|very|highly)\s+)?"
+    r"(?:necessary|important|possible|impossible|required|recommended|essential|clear|"
+    r"likely|unlikely|mandatory|advisable|acceptable|difficult|easy|critical|expected|"
+    r"assumed|understood|noted|determined)\b"
+    r"|^\s+(?:seems|appears|rains)\b",
+    re.IGNORECASE,
+)
 
 
-def detect_pronoun(text: str) -> list[dict[str, Any]]:
-    """Detect pronoun reference ambiguity in a sentence.
+def _is_plural(word: str) -> bool:
+    w = word.lower()
+    return w.endswith("s") and not w.endswith(("ss", "us", "is"))
 
-    Args:
-        text: Sentence text to analyze.
 
-    Returns:
-        List of detection dictionaries strictly complying with shared_schema.json:
-        [{"source": "rules", "label": "pronoun", "span": str, "confidence": None, "reason": str}]
-    """
-    if not text or not text.strip():
-        return []
+def _candidates(before: str) -> List[str]:
+    heads = []
+    for m in _NP.finditer(before):
+        first, second = m.group(1), m.group(2)
+        word = first
+        if first.lower() in _ADJ_SKIP and second:
+            word = second
+        if word.lower() in _NOT_NOUN or word.lower() in _ADJ_SKIP:
+            continue
+        if word.lower() not in [h.lower() for h in heads]:
+            heads.append(word)
+    return heads
 
-    # Clear sentence exemption: single unambiguous referent
-    if re.search(r"\bThe temperature sensor records a reading.*?stores it\b", text, re.IGNORECASE):
-        return []
 
-    for pattern, reason_tmpl in PRONOUN_PATTERNS:
-        match = re.search(pattern, text, re.IGNORECASE)
-        if match:
-            groups = match.groups()
-            span = groups[-1] if groups else match.group(0)
-            ant1 = groups[0] if len(groups) > 1 else "first entity"
-            ant2 = groups[1] if len(groups) > 2 else "second entity"
-            reason = reason_tmpl.format(
-                span=span,
-                ant1=ant1,
-                ant2=ant2,
-                role1=ant1,
-                role2=ant2,
-                noun1=ant1,
-                noun2=ant2,
-            )
-            return [{
-                "source": "rules",
-                "label": "pronoun",
-                "span": span,
-                "confidence": None,
-                "reason": reason
-            }]
+def _compatible(pronoun: str, heads: List[str]) -> List[str]:
+    p = pronoun.lower()
+    if p in {"it", "its"}:
+        return [h for h in heads if not _is_plural(h) and h.lower() not in _PERSON]
+    if p in {"they", "them", "their", "theirs"}:
+        return [h for h in heads if _is_plural(h)]
+    return [h for h in heads if h.lower() in _PERSON]
 
-    return []
 
+def detect_pronoun(sentence: str) -> List[Dict]:
+    out = []
+    for m in _PRONOUN.finditer(sentence):
+        pron = m.group(0)
+        if pron.lower() == "it" and _EXPLETIVE.search(sentence[m.end():]):
+            continue
+        cands = _compatible(pron, _candidates(sentence[:m.start()]))
+        if len(cands) < 2:
+            continue
+        listed = ", ".join(f'"{c}"' for c in cands[:-1]) + f' or "{cands[-1]}"'
+        reason = f'The pronoun "{pron}" could refer to {listed}.'
+        out.append(make_detection("pronoun", sentence, m.start(), m.end(), reason))
+    return out

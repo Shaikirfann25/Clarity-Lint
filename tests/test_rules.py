@@ -1,265 +1,171 @@
-"""Unit test suite for Clarity Lint rule-based ambiguity detection (Person 2).
+"""Unit tests for the rule-based detectors (Person 2).
 
-Covers:
-- Schema and contract compliance (docs/shared_schema.json, docs/integration_contract.md)
-- Positive, negative, and edge cases across all five categories:
-  * vague
-  * attachment
-  * scope
-  * pronoun
-  * no_ambiguity
-- Precedence hierarchy: attachment > pronoun > scope > vague > no_ambiguity
+Every sentence here was hand-checked. Positives assert label AND exact span;
+negatives assert that the label is NOT produced.
+Add a regression test below for every bug you fix.
 """
-
 import pytest
 
-from src.rules import (
-    detect,
-    detect_attachment,
-    detect_pronoun,
-    detect_scope,
-    detect_sentence,
-    detect_vague,
-    predict_label,
-)
-
-AGREED_LABELS = {"attachment", "pronoun", "scope", "vague", "no_ambiguity"}
-DETECTION_KEYS = {"source", "label", "span", "confidence", "reason"}
+from src.rules.attachment import detect_attachment
+from src.rules.common import LABELS
+from src.rules.detect import detect, detect_sentence, primary_label
+from src.rules.pronoun import detect_pronoun
+from src.rules.scope import detect_scope
+from src.rules.vague_detector import detect_vague
 
 
-# ==============================================================================
-# 1. SCHEMA & CONTRACT COMPLIANCE TESTS
-# ==============================================================================
-
-def test_detection_schema_fields():
-    """Verify that every detection dictionary contains the exact required keys."""
-    results = detect(["The admin monitors the user with the sensor."])
-    assert len(results) >= 1
-    for d in results:
-        assert set(d.keys()) == DETECTION_KEYS
-        assert d["source"] == "rules"
-        assert d["confidence"] is None  # Rules must NEVER invent confidence
-        assert d["label"] in AGREED_LABELS
-        assert isinstance(d["span"], str)
-        assert isinstance(d["reason"], str)
+def spans(preds):
+    return [p["span"] for p in preds]
 
 
-def test_detect_empty_inputs():
-    """Verify safe handling of empty inputs."""
-    assert detect([]) == []
-    assert detect("") == []
-    assert detect("   ") == []
-    assert detect_sentence("") == []
-
-
-def test_detect_single_string_coercion():
-    """Verify detect() accepts a single string without raising TypeError."""
-    results = detect("The system should respond quickly.")
-    assert isinstance(results, list)
-    assert any(d["label"] == "vague" for d in results)
-
-
-def test_detect_unambiguous_sentence_returns_empty_list():
-    """Unflagged clear sentences must return an empty list for clean integration."""
-    results = detect(["The server must respond within 200 milliseconds."])
-    assert results == []
-
-
-def test_detect_batch_sentences():
-    """Verify batch processing of multiple sentences."""
-    sentences = [
-        "The system should respond quickly.",
-        "Maria submitted the assignment on Friday.",
-        "When Priya called Ananya she was very upset.",
-    ]
-    results = detect(sentences)
-    labels = [d["label"] for d in results]
-    assert "vague" in labels
-    assert "pronoun" in labels
-
-
-# ==============================================================================
-# 2. VAGUE LANGUAGE TESTS
-# ==============================================================================
-
-@pytest.mark.parametrize("sentence, expected_span", [
-    ("The system should respond quickly.", "quickly"),
-    ("Please send the update soon.", "soon"),
-    ("The project must be completed promptly.", "promptly"),
-    ("The team should communicate regularly about status.", "regularly"),
-    ("The migration script should complete in a reasonable amount of time.", "reasonable amount of time"),
-    ("Please submit the report as soon as possible.", "as soon as possible"),
-    ("Employees must complete the training in a timely manner.", "timely manner"),
-    ("The configuration process should be simple to follow.", "simple to follow"),
-    ("The codebase must be maintainable.", "maintainable"),
-    ("The software must be robust enough to handle edge cases.", "robust enough"),
+# ---------------------------------------------------------------- vague ------
+@pytest.mark.parametrize("sentence, expected", [
+    ("The system shall respond soon after login.", ["soon"]),
+    ("Backups run regularly.", ["regularly"]),
+    ("The user may be notified as needed.", ["as needed"]),
+    ("Appropriate measures shall be taken.", ["Appropriate"]),
+    ("Complete the task as soon as possible.", ["as soon as possible"]),  # no extra 'soon'
 ])
-def test_vague_detector_positive_cases(sentence, expected_span):
-    detections = detect_vague(sentence)
-    assert len(detections) >= 1
-    assert detections[0]["label"] == "vague"
-    assert expected_span.lower() in detections[0]["span"].lower()
+def test_vague_positive(sentence, expected):
+    assert spans(detect_vague(sentence)) == expected
 
 
 @pytest.mark.parametrize("sentence", [
-    "The server must respond within 200 milliseconds.",
-    "The service must achieve 99.9 percent uptime measured over each calendar month.",
-    "The CI build must complete in under five minutes.",
-    "The company was founded in 2012 and currently employs 3,200 full-time staff.",
-    "Application logs must be retained for exactly 90 days.",
-    "The file upload limit is 25 megabytes per individual file.",
+    "The system shall respond within 2 seconds.",
+    "Backups run every 24 hours.",
+    "The report is sent to the manager.",
 ])
-def test_vague_detector_negative_cases(sentence):
-    """Specific measurable numbers and thresholds must not be flagged as vague."""
+def test_vague_negative(sentence):
     assert detect_vague(sentence) == []
 
 
-# ==============================================================================
-# 3. ATTACHMENT AMBIGUITY TESTS
-# ==============================================================================
+def test_vague_custom_lexicon():
+    assert spans(detect_vague("Respond with low latency.", lexicon=["low latency"])) == ["low latency"]
+    assert detect_vague("Respond soon.", lexicon=[]) == []
 
-@pytest.mark.parametrize("sentence, expected_span", [
-    ("The admin monitors the user with the sensor.", "with the sensor"),
-    ("She saw the man with the telescope.", "with the telescope"),
-    ("He installed the software with the missing drivers.", "with the missing drivers"),
-    ("The journalist interviewed the protester standing outside the building.", "standing outside the building"),
-    ("The suspect was arrested near the school wearing a dark hoodie.", "wearing a dark hoodie"),
-    ("Tired after the long meeting, the project was postponed.", "Tired after the long meeting"),
-    ("Having reviewed the contract, the decision was made to proceed.", "Having reviewed the contract"),
-    ("Built on an unstable foundation, the architect warned about the structure.", "Built on an unstable foundation"),
-    ("She submitted the sample to the lab that needed overnight analysis.", "that needed overnight analysis"),
-    ("Old men and women lined up at the registration desk.", "Old men and women"),
-])
-def test_attachment_detector_positive_cases(sentence, expected_span):
-    detections = detect_attachment(sentence)
-    assert len(detections) >= 1
-    assert detections[0]["label"] == "attachment"
-    assert expected_span.lower() in detections[0]["span"].lower()
+
+# ----------------------------------------------------------- attachment ------
+def test_attachment_doc_example():
+    preds = detect_attachment("The admin monitors the user with the sensor.")
+    assert spans(preds) == ["with the sensor"]
+    assert preds[0]["label"] == "attachment"
+
+
+def test_attachment_other_positive():
+    assert spans(detect_attachment("The doctor examined the patient with the stethoscope.")) == [
+        "with the stethoscope"]
 
 
 @pytest.mark.parametrize("sentence", [
-    "Insert the USB drive into the port on the right side of the laptop.",
-    "Run pip install -r requirements.txt in the project root to install all dependencies.",
-    "Push all code changes to a feature branch and open a pull request targeting main.",
-    "The second-floor fire exit is at the far end of the east corridor.",
-    "The orange cable connects the router to the modem and must not connect to the laptop.",
+    "The admin uses the sensor to monitor the user.",
+    "The admin monitors the user.",
+    "The system shall comply with the following requirements.",
+    "The system updates the record with the following values.",
 ])
-def test_attachment_detector_negative_cases(sentence):
-    """Standard, clear technical instructions must not be flagged as ambiguous attachment."""
+def test_attachment_negative(sentence):
     assert detect_attachment(sentence) == []
 
 
-# ==============================================================================
-# 4. SCOPE AMBIGUITY TESTS
-# ==============================================================================
+def test_attachment_prepositions_configurable():
+    s = "The system updates the record using the API."
+    assert detect_attachment(s) == []
+    assert spans(detect_attachment(s, prepositions=("with", "using"))) == ["using the API"]
 
-@pytest.mark.parametrize("sentence, expected_span", [
-    ("Every student did not submit the assignment.", "Every"),
-    ("All system event logs are not retained beyond the 30-day retention window.", "All"),
-    ("Not all users have been successfully migrated to the new platform.", "Not all"),
-    ("She does not process every request that arrives in her inbox.", "does not"),
-    ("Every engineer validated the hardware or the software interface.", "Every"),
-    ("Each applicant signed the consent form and the confidentiality agreement.", "Each"),
-    ("Users cannot view or modify records belonging to other accounts.", "cannot"),
-    ("Staff should not bypass the approval workflow or the compliance audit.", "should not"),
-    ("She does not like coffee or tea.", "does not"),
-    ("The team must not merge code without a passing review and sign-off.", "without"),
-    ("She just added a paragraph to the introduction of the report.", "just"),
-    ("He merely glanced at the agreement before appending his signature.", "merely"),
+
+# ---------------------------------------------------------------- scope ------
+@pytest.mark.parametrize("sentence, expected", [
+    ("All users cannot edit the report.", ["All users cannot"]),
+    ("Each request is not logged.", ["Each request is not"]),
+    ("The system only sends reports to managers.", ["only"]),
+    ("The system rejects invalid passwords and usernames.", ["invalid passwords and usernames"]),
+    ("Admins and managers or auditors can view logs.", ["Admins and managers or auditors"]),
 ])
-def test_scope_detector_positive_cases(sentence, expected_span):
-    detections = detect_scope(sentence)
-    assert len(detections) >= 1
-    assert detections[0]["label"] == "scope"
-    assert expected_span.lower() in detections[0]["span"].lower()
+def test_scope_positive(sentence, expected):
+    preds = detect_scope(sentence)
+    assert spans(preds) == expected
+    assert all(p["label"] == "scope" for p in preds)
 
 
 @pytest.mark.parametrize("sentence", [
-    "The temperature sensor records a reading every five minutes and stores it in Cloud Storage.",
-    "All API endpoints must require authentication using a valid JWT token.",
-    "The users table has five columns: id, full_name, email, created_at, and account_status.",
-    "The requirements.txt file lists all Python packages needed to run this project.",
-    "Press Ctrl+S to save and Ctrl+Z to undo the last edit.",
+    "The system shall not store passwords.",
+    "Users must not share passwords.",
+    "Only managers can approve requests.",
+    "The system sends reports only to managers.",
+    "Users and/or admins can view logs.",
+    "The system sends the report to the manager and the admin.",
+    "All users are required to log in.",
 ])
-def test_scope_detector_negative_cases(sentence):
-    """Unambiguous scope and quantified intervals must not be flagged as ambiguous scope."""
+def test_scope_negative(sentence):
     assert detect_scope(sentence) == []
 
 
-# ==============================================================================
-# 5. PRONOUN AMBIGUITY TESTS
-# ==============================================================================
-
-@pytest.mark.parametrize("sentence, expected_pronoun", [
-    ("The senior engineers informed the junior engineers that they had missed an important constraint.", "they"),
-    ("The HR team notified the department heads that they had to submit performance reviews.", "they"),
-    ("When Priya called Ananya she was very upset.", "she"),
-    ("When Raj emailed Vivek the reply he had not yet read the original message.", "he"),
-    ("The project manager and the product owner disagreed and he escalated the matter.", "he"),
-    ("The client spoke with the developer and then he cancelled the contract.", "he"),
-    ("The administrator found the misconfiguration in the firewall rule and updated it immediately.", "it"),
-    ("The developer discovered the vulnerability in the library and patched it immediately.", "it"),
-    ("The database went offline unexpectedly and this blocked all active user transactions.", "this"),
-    ("The professor returned the student's thesis with his detailed annotations.", "his"),
+# -------------------------------------------------------------- pronoun ------
+@pytest.mark.parametrize("sentence, pronoun", [
+    ("The server sends the request to the client when it is ready.", "it"),
+    ("The admin notifies the user when he logs in.", "he"),
+    ("The developers reviewed the patches and they were merged.", "they"),
 ])
-def test_pronoun_detector_positive_cases(sentence, expected_pronoun):
-    detections = detect_pronoun(sentence)
-    assert len(detections) >= 1
-    assert detections[0]["label"] == "pronoun"
-    assert expected_pronoun.lower() in detections[0]["span"].lower()
+def test_pronoun_positive(sentence, pronoun):
+    preds = detect_pronoun(sentence)
+    assert spans(preds) == [pronoun]
+    assert preds[0]["label"] == "pronoun"
 
 
 @pytest.mark.parametrize("sentence", [
-    "Maria submitted her assignment on Friday.",
-    "The temperature sensor records a reading every five minutes and stores it in Cloud Storage.",
-    "Insert the USB drive into the port on the right side of the laptop.",
-    "The meeting is scheduled for Monday, November 4th at 10:00 AM in Room 3B.",
-    "Pull request number 312 was merged into main by Shaik on Tuesday at 11:42 AM.",
+    "The user clicks the button and it opens the dialog.",   # one non-person candidate
+    "It is important to log every request.",                  # expletive 'it'
+    "The manager approved the report because he trusted the team.",  # one person candidate
+    "The system stores the data.",                            # no pronoun
 ])
-def test_pronoun_detector_negative_cases(sentence):
-    """Sentences with single unambiguous referents must not be flagged as pronoun ambiguity."""
+def test_pronoun_negative(sentence):
     assert detect_pronoun(sentence) == []
 
 
-# ==============================================================================
-# 6. PRECEDENCE HIERARCHY TESTS
-# ==============================================================================
-
-def test_precedence_attachment_over_vague():
-    """Verify attachment takes precedence over vague modifier per Section 5 of guide."""
-    # 'Old men and women' has attachment ambiguity and 'old' is slightly imprecise
-    sentence = "Old men and women lined up at the registration desk."
-    assert predict_label(sentence) == "attachment"
-
-    detections = detect_sentence(sentence)
-    assert len(detections) >= 1
-    assert detections[0]["label"] == "attachment"
-
-
-def test_precedence_attachment_over_pronoun():
-    """When both attachment and pronoun triggers exist, attachment takes precedence."""
-    sentence = "He interviewed the professor with the new research data."
-    assert predict_label(sentence) == "attachment"
+# ---------------------------------------------------- combined / schema ------
+def test_detect_schema_and_exact_spans():
+    sentences = [
+        "The admin monitors the user with the sensor soon.",
+        "The system shall respond within 2 seconds.",
+    ]
+    records = detect(sentences)
+    assert [r["sentence_id"] for r in records] == ["S001", "S002"]
+    for r in records:
+        for p in r["predictions"]:
+            assert p["source"] == "rules"
+            assert p["confidence"] is None
+            assert p["label"] in LABELS
+            assert p["span"] in r["text"]            # exact substring
+            assert isinstance(p["reason"], str) and p["reason"]
+    assert [p["label"] for p in records[0]["predictions"]] == ["attachment", "vague"]
+    assert records[1]["predictions"] == []
 
 
-def test_precedence_scope_over_vague():
-    """Universal negation with vague term should prioritize scope."""
-    sentence = "Every student did not complete the simple assignment."
-    assert predict_label(sentence) == "scope"
+def test_detect_is_deterministic():
+    s = ["The server sends the request to the client when it is ready as needed."] * 3
+    assert detect(s) == detect(s)
+    recs = detect(s)
+    assert recs[0]["predictions"] == recs[1]["predictions"]
+    assert {p["label"] for p in recs[0]["predictions"]} == {"pronoun", "vague"}
 
 
-# ==============================================================================
-# 7. PREDICT_LABEL COMPREHENSIVE TESTS
-# ==============================================================================
+def test_detect_accepts_dicts_and_passes_ids():
+    recs = detect([{"sentence_id": "X9", "text": "Respond soon.", "gold_label": "vague"}])
+    assert recs[0]["sentence_id"] == "X9" and recs[0]["gold_label"] == "vague"
 
-@pytest.mark.parametrize("sentence, expected_label", [
-    ("The system should respond quickly.", "vague"),
-    ("She saw the man with the telescope.", "attachment"),
-    ("Every student did not submit the assignment.", "scope"),
-    ("When Priya called Ananya she was very upset.", "pronoun"),
-    ("The server must respond within 200 milliseconds.", "no_ambiguity"),
-    ("Maria submitted the assignment on Friday.", "no_ambiguity"),
-])
-def test_predict_label_all_classes(sentence, expected_label):
-    assert predict_label(sentence) == expected_label
 
+def test_primary_label():
+    rec = detect(["The admin monitors the user with the sensor soon."])[0]
+    assert primary_label(rec) == "attachment"
+    assert primary_label(rec, priority=("vague", "attachment")) == "vague"
+    assert primary_label(detect(["The system stores the data."])[0]) == "no_ambiguity"
+
+
+def test_enabled_rules_filter():
+    preds = detect_sentence("The admin monitors the user with the sensor soon.", enabled=["vague"])
+    assert [p["label"] for p in preds] == ["vague"]
+
+
+def test_empty_and_bad_input():
+    assert detect([""])[0]["predictions"] == []
+    with pytest.raises(ValueError):
+        detect([{"sentence_id": "S1"}])

@@ -1,99 +1,104 @@
-"""Scope ambiguity detection module for Clarity Lint.
+"""Conservative scope-ambiguity rules. Each rule fires only when we can name
+the competing readings.
 
-Detects scope ambiguities where the semantic reach of a quantifier (all, every, each, some, few),
-a negation (not, never, cannot), a focus adverb (only, just, merely), or a coordination (and, or)
-is structurally uncertain.
+1. Quantifier + negation:   "All users cannot edit the report."
+2. "only" before a verb with several following phrases.
+3. Modifier + coordination: "invalid passwords and usernames."
+4. Mixed and/or without grouping: "admins and managers or auditors".
 """
-
 import re
-from typing import Any
+from typing import Dict, List
 
-SCOPE_PATTERNS: list[tuple[str, str]] = [
-    # Quantifier + Negation: e.g. "Every student did not submit..."
-    (
-        r"\b(Every|All|Each|Some|Several|A few|Many)\b.*?\b(did not|does not|do not|was not|were not|is not|are not|cannot|must not|should not|have not yet|never)\b",
-        "Interaction between quantifier and negation creates universal vs. partial negation scope ambiguity."
-    ),
-    # Fronted negation + quantifier: e.g. "Not all users...", "Not every submitted form..."
-    (
-        r"\b(Not all|Not every)\b",
-        "Fronted negation with universal quantifier creates ambiguous negation scope."
-    ),
-    # Negation + Quantifier: e.g. "does not process every request..."
-    (
-        r"\b(did not|does not|do not|cannot|should not|must not|never)\b.*?\b(every|all|each)\b",
-        "Negation scoping over universal quantifier allows both total and partial readings."
-    ),
-    # Universal Quantifier + Action + Coordination:
-    (
-        r"\b(Every|Each|All)\s+[a-z0-9_\- ]+?\s+(?:must|should|can|may|reviewed|signed|submitted|validated|completed|read|agreed|passes|pass|passed)\b.*?\b(?:and|or)\b",
-        "Universal quantifier '{span}' with conjunction/disjunction creates distributive vs. collective reading ambiguity."
-    ),
-    # Negation + Disjunction / Coordination:
-    (
-        r"\b(cannot|must not|should not|does not|did not|do not|will not|never)\b.*?\b(or|and the appendix)\b",
-        "Negation scoping over disjunction or coordination creates De Morgan scope ambiguity."
-    ),
-    # Preposition 'without' + coordination: e.g. "without authorization and documentation"
-    (
-        r"\bwithout\s+[a-z_\- ]+\s+and\s+[a-z_\- ]+\b",
-        "Scope of 'without' over coordinated terms can mean both are required or either one suffices."
-    ),
-    # Disjunctive choice with 'or' / 'may ... or':
-    (
-        r"\b(?:provide|generates|initiated|approve|review|choose|submit|take|contact|complete|may\s+approve|may\s+complete|may\s+contact)\b.*?\b([a-z0-9_\- ]+\s+or\s+[a-z0-9_\- ]+)\b",
-        "Disjunction 'or' creates ambiguity between exclusive and inclusive choice."
-    ),
-    # Adverbial scope:
-    (
-        r"\b(never\s+said)\b",
-        "Scope of 'never' over the speech act vs. the embedded clause."
-    ),
-    (
-        r"\b(Few\s+candidates)\b",
-        "Existential or downward-entailing quantifier 'Few' creates ambiguous scope."
-    ),
-    # Focus adverbs: 'only', 'merely', 'just'
-    (
-        r"\b(only|merely|just)\b",
-        "Focus adverb '{span}' has ambiguous semantic scope over the adjacent phrase or entire clause."
-    ),
-]
+from .common import make_detection
 
-def detect_scope(text: str) -> list[dict[str, Any]]:
-    """Detect scope ambiguity in a sentence.
+# --- 1. quantifier + negation -------------------------------------------------
+_NEG = (r"(?:cannot|(?:is|are|was|were|do|does|did|can|could|will|would|has|have|had)\s+not|"
+        r"(?:isn|aren|wasn|weren|don|doesn|didn|couldn|won|wouldn|hasn|haven|hadn|can)['’]t)")
+_QUANT_NEG = re.compile(rf"\b(?:all|every|each|both)\b[^.;:!?]{{0,80}}?\b{_NEG}", re.IGNORECASE)
 
-    Args:
-        text: Sentence text to analyze.
+# --- 2. "only" ----------------------------------------------------------------
+_ONLY = re.compile(r"\bonly\b", re.IGNORECASE)
+_ONLY_PREV_SKIP = {"the", "not", "and", "a", "an", "its", "their", "his", "her", "this", "that"}
+_ONLY_NEXT_SKIP = {"if", "when", "once", "one", "a", "an", "single", "after", "before", "unless", "until"}
+_PREPS = {"to", "by", "for", "in", "on", "at", "with", "from", "during", "after", "before", "when", "if"}
 
-    Returns:
-        List of detection dictionaries strictly complying with shared_schema.json:
-        [{"source": "rules", "label": "scope", "span": str, "confidence": None, "reason": str}]
-    """
-    if not text or not text.strip():
-        return []
+# --- 3. modifier + coordination ----------------------------------------------
+_MODIFIERS = (
+    "secure", "valid", "invalid", "encrypted", "authorized", "unauthorized",
+    "new", "old", "large", "small", "electronic", "written", "approved",
+    "registered", "local", "external", "internal", "remote", "public",
+    "private", "temporary", "faulty", "damaged", "expired", "existing",
+)
+_NOT_NOUN_AFTER_COORD = (r"(?:the|a|an|its|their|his|her|this|that|these|those|all|any|"
+                         r"each|every|no|not|to|it|they|then)")
+_MOD_COORD = re.compile(
+    rf"\b(?P<mod>{'|'.join(_MODIFIERS)})\s+(?P<n1>[A-Za-z][A-Za-z-]*)\s+(?P<c>and|or)\s+"
+    rf"(?!{_NOT_NOUN_AFTER_COORD}\b)(?P<n2>[A-Za-z][A-Za-z-]*)\b",
+    re.IGNORECASE,
+)
 
-    # Clear sentence exemptions
-    if re.search(r"\bevery\s+\d+\s+(?:minutes|seconds|hours|days)\b", text, re.IGNORECASE):
-        return []
-    if re.search(r"\bAll\s+(?:API endpoints|passwords|form inputs|source files|five team members|user data|code changes)\b", text, re.IGNORECASE):
-        if not re.search(r"\b(did not|was not|were not|cannot|does not|should not|must not)\b", text, re.IGNORECASE):
-            return []
-    if re.search(r"\b(?:The username field accepts only|contains all datasets|linter errors and warnings|stores all user data)\b", text, re.IGNORECASE):
-        return []
+# --- 4. mixed and/or ----------------------------------------------------------
+_MIXED = re.compile(
+    r"\b(?P<a>[A-Za-z][A-Za-z-]*)\s+(?P<c1>and|or)\s+(?P<b>[A-Za-z][A-Za-z-]*)\s+"
+    r"(?P<c2>and|or)\s+(?P<c>[A-Za-z][A-Za-z-]*)\b",
+    re.IGNORECASE,
+)
 
-    for pattern, reason in SCOPE_PATTERNS:
-        match = re.search(pattern, text, re.IGNORECASE)
-        if match:
-            groups = match.groups()
-            span = groups[0] if groups else match.group(0)
-            formatted_reason = reason.format(span=span) if "{span}" in reason else reason
-            return [{
-                "source": "rules",
-                "label": "scope",
-                "span": span,
-                "confidence": None,
-                "reason": formatted_reason
-            }]
 
-    return []
+def _quantifier_negation(s: str) -> List[Dict]:
+    out = []
+    for m in _QUANT_NEG.finditer(s):
+        quant = re.match(r"\w+", m.group(0)).group(0)
+        reason = (f'Negation and the quantifier "{quant}" can interact: it may mean '
+                  f'"not {quant.lower()} of them" or "none of them".')
+        out.append(make_detection("scope", s, m.start(), m.end(), reason))
+    return out
+
+
+def _only_rule(s: str) -> List[Dict]:
+    out = []
+    for m in _ONLY.finditer(s):
+        before = s[:m.start()].split()
+        if not before:                      # sentence-initial "Only admins can..."
+            continue
+        if before[-1].lower().strip(",;:()\"'") in _ONLY_PREV_SKIP:
+            continue
+        clause = re.split(r"[.;:!?]", s[m.end():], maxsplit=1)[0]
+        words = re.findall(r"[A-Za-z'-]+", clause)
+        if len(words) < 3 or words[0].lower() in _ONLY_NEXT_SKIP:
+            continue
+        if not ({w.lower() for w in words} & _PREPS):
+            continue
+        reason = ('"only" can limit the verb, the object, or the later phrase '
+                  '(e.g. "only sends" vs "only reports" vs "only to admins"), '
+                  "so the sentence can be read in more than one way.")
+        out.append(make_detection("scope", s, m.start(), m.end(), reason))
+    return out
+
+
+def _modifier_coordination(s: str) -> List[Dict]:
+    out = []
+    for m in _MOD_COORD.finditer(s):
+        mod, n1, c, n2 = m.group("mod"), m.group("n1"), m.group("c"), m.group("n2")
+        reason = (f'"{mod}" may apply only to "{n1}" or to both "{n1}" and "{n2}" '
+                  f'("{mod} {n1} {c} {n2}").')
+        out.append(make_detection("scope", s, m.start(), m.end(), reason))
+    return out
+
+
+def _mixed_and_or(s: str) -> List[Dict]:
+    out = []
+    for m in _MIXED.finditer(s):
+        c1, c2 = m.group("c1").lower(), m.group("c2").lower()
+        if c1 == c2:
+            continue
+        a, b, c = m.group("a"), m.group("b"), m.group("c")
+        reason = (f'Mixing "and" and "or" without grouping can mean "({a} {c1} {b}) {c2} {c}" '
+                  f'or "{a} {c1} ({b} {c2} {c})".')
+        out.append(make_detection("scope", s, m.start(), m.end(), reason))
+    return out
+
+
+def detect_scope(sentence: str) -> List[Dict]:
+    return (_quantifier_negation(sentence) + _only_rule(sentence)
+            + _modifier_coordination(sentence) + _mixed_and_or(sentence))

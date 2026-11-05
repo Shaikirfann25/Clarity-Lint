@@ -1,144 +1,81 @@
-"""Attachment ambiguity detection module for Clarity Lint.
+"""Conservative prepositional-phrase attachment detection.
 
-Detects structural ambiguities where a modifier (PP, participial phrase, or relative clause)
-can attach to more than one grammatical constituent in the sentence.
+Pattern: VERB + determiner noun phrase + PREPOSITION + determiner noun
+    "The admin monitors the user with the sensor."
+The phrase "with the sensor" may attach to the verb (the admin uses a sensor)
+or to the noun phrase (the user has a sensor).
+
+This is deliberately narrow (no parser): it only fires on a known verb, a
+determiner NP, then a preposition in `prepositions`. Default is ("with",)
+because "with" is the classic instrument/accompaniment clash. You can pass
+("with", "using", "in", "on") to widen it, at the cost of more false positives.
 """
-
 import re
-from typing import Any
+from typing import Dict, List, Sequence
 
-ATTACHMENT_PATTERNS: list[tuple[str, str]] = [
-    # Dangling or fronted participial modifiers (regular and irregular participles)
-    (
-        r"^((?:[A-Z][a-z]+(?:ed|en|ing)|Built|Found|Left|Held|Kept|Lost|Torn|Set|Known)\s+(?:by|after|in|on|with|outside|inside|under|during|through|for|near|down)\b[^,]+),\s*([A-Za-z]+)",
-        "Fronted or dangling modifier '{span}' may not logically or grammatically attach to '{subject}'."
-    ),
-    (
-        r"^(Having\s+[a-z]+(?:ed|en)\b[^,]+),\s*([A-Za-z]+)",
-        "Participial phrase '{span}' dangles or creates ambiguous agent attachment."
-    ),
-    (
-        r"^([A-Z][a-z]+ing\s+(?:the|a|an)\s+[a-z]+),\s*([A-Za-z]+)",
-        "Fronted non-finite clause '{span}' creates an ambiguous attachment to the following subject."
-    ),
-    # PP attachment with 'with': Verb + Object NP + with + NP
-    (
-        r"\b(?:[a-z]+(?:ed|s|ing)?)\s+(?:the|a|an|his|her)\s+[a-z_\- ]+?\s+(with\s+(?:the|a|an|his|her|their|new|damaged|missing|structural|revised|glass|highest|favorable|unfavorable|long)\s+[a-z_\-]+(?:\s+[a-z_\-]+)?)",
-        "Prepositional phrase '{span}' may attach to the preceding noun phrase or to the main action verb."
-    ),
-    # PP with 'from': Verb + Object NP + from + NP
-    (
-        r"\b(?:sent|saw|called|reviewed|received|greeted|found|presented|approved)\b.*?\s+(from\s+(?:her|his|their|the|a)\s+(?:office|phone|reception\s+desk|desk|mobile|auditor|client|external\s+consultants|contractor|revised\s+proposal|last\s+quarter))\b",
-        "Prepositional phrase '{span}' may attach to the action or to the preceding noun."
-    ),
-    # PP with 'against': e.g. "reviewed the complaint from the client against the new policy"
-    (
-        r"\b(against\s+the\s+new\s+policy)\b",
-        "Prepositional phrase '{span}' could modify the complaint or the review action."
-    ),
-    # Post-object participial modifier: e.g. "interviewed the protester standing outside the building"
-    (
-        r"\b(?:the|a|an)\s+[a-z]+\s+(standing\s+(?:outside|inside|near|in|at)\s+(?:the|a)\s+[a-z]+)",
-        "Participial phrase '{span}' can modify the preceding object or the main subject/action."
-    ),
-    (
-        r"\b(?:the|a|an)\s+[a-z]+\s+(wearing\s+(?:a|an|the)\s+[a-z]+(?:\s+[a-z]+)?)",
-        "Participial modifier '{span}' can ambiguously modify either participant in the event."
-    ),
-    (
-        r"\b(?:the|a|an)\s+[a-z]+\s+(talking\s+to\s+(?:the|a)\s+[a-z]+(?:\s+in\s+the\s+[a-z]+)?)",
-        "Participial phrase '{span}' may modify the direct object or the main subject."
-    ),
-    (
-        r"\b(?:the|a|an)\s+[a-z]+\s+(celebrating\s+(?:on|in|at)\s+(?:the|a)\s+[a-z]+)",
-        "Participial phrase '{span}' may modify the coordinated nouns or the main verb."
-    ),
-    (
-        r"\b(?:the|a|an)\s+[a-z]+\s+(walking\s+to\s+(?:the|a)\s+[a-z]+(?:\s+from\s+[a-z ]+)?)",
-        "Participial phrase '{span}' can modify the object or the main subject."
-    ),
-    (
-        r"\b(?:the|a|an)\s+[a-z]+\s+(playing\s+near\s+(?:the|a)\s+[a-z]+(?:\s+in\s+the\s+[a-z]+)?)",
-        "Participial phrase '{span}' can modify the object or the main clause."
-    ),
-    (
-        r"\b(?:left\s+by\s+(?:the|a)\s+[a-z]+)",
-        "Passive participial phrase '{span}' can ambiguously attach to either preceding noun."
-    ),
-    # Relative clause attachment with stacked nouns:
-    (
-        r"\b(?:to|in|for|from|about|inside)\s+(?:the|a)\s+[a-z ]+?\s+(that\s+(?:was|had|is|needed|contained|opened)\s+[a-z_\-]+(?:\s+[a-z_\-]+)?)",
-        "Relative clause '{span}' could attach to the matrix noun or the object of the preposition."
-    ),
-    (
-        r"\b(?:attended\s+to\s+the\s+patient\s+who\s+arrived\s+in\s+the\s+treatment\s+area)",
-        "Prepositional phrase 'in the treatment area' can attach to 'arrived' or 'attended'."
-    ),
-    (
-        r"\b(?:serving\s+another\s+customer\s+at\s+the\s+window)",
-        "Prepositional phrase 'at the window' can attach to 'serving' or 'handed'."
-    ),
-    # Locative / temporal PP attachment after relative or complex clause:
-    (
-        r"\b(?:that|who|which)\s+[a-z_\- ]+?\s+(on\s+(?:the\s+new\s+field|the\s+conference\s+table|Monday|Friday)|in\s+the\s+(?:control\s+room|morning\s+session|evening\s+briefing)|via\s+the\s+online\s+portal)\b",
-        "Prepositional phrase '{span}' can attach to the main action or the embedded clause."
-    ),
-    # Stacked PP:
-    (
-        r"\b(in\s+the\s+inbox\s+on\s+the\s+right|on\s+the\s+third\s+floor\s+to\s+the\s+receptionist|for\s+the\s+audit\s+team\s+to\s+the\s+wrong\s+address|about\s+the\s+meeting\s+to\s+the\s+wrong\s+department)\b",
-        "Stacked prepositional phrase '{span}' creates multiple attachment sites."
-    ),
-    # Coordinated NP scope/attachment modifier:
-    (
-        r"\b(Old\s+men\s+and\s+women)\b",
-        "Modifier 'Old' can ambiguously scope over just 'men' or both 'men and women'."
-    ),
-    (
-        r"\b((?:almost|nearly)\s+(?:deleted|overlooked|missed|crashed|completed))\b",
-        "Adverb '{span}' can scope over the verb action or the resulting state."
-    ),
-    (
-        r"\b(tagged\s+it\s+as\s+the\s+latest\s+stable\s+release)\b",
-        "Coordinated verb phrase attachment ambiguity."
-    )
-]
+from .common import make_detection
 
-CLEAR_EXEMPTIONS = re.compile(
-    r"\b(?:Insert the USB drive|Run pip install|Push all code changes|Pull request number|Press Ctrl|The second-floor fire exit|The green LED|The orange cable)\b",
-    re.IGNORECASE,
+_VERB_BASES = (
+    "monitor", "see", "observe", "inspect", "notify", "track", "check",
+    "review", "scan", "watch", "open", "send", "update", "approve", "process",
+    "validate", "read", "display", "handle", "report", "log", "record",
+    "identify", "detect", "examine", "test", "verify", "contact", "assign",
+    "inform", "guide", "help", "serve", "support", "meet", "greet", "call",
+    "photograph", "film", "identify", "locate", "find", "follow", "protect",
 )
 
 
-def detect_attachment(text: str) -> list[dict[str, Any]]:
-    """Detect attachment ambiguity in a sentence.
+def _verb_forms(bases: Sequence[str]) -> List[str]:
+    forms = set()
+    for v in bases:
+        forms.update({v, v + "s", v + "es", v + "ed", v + "d", v + "ing"})
+        if v.endswith("e"):
+            forms.add(v[:-1] + "ing")
+        if v.endswith("y"):
+            forms.update({v[:-1] + "ies", v[:-1] + "ied"})
+    forms.update({"saw", "seen", "sent", "found", "held"})
+    return sorted(forms, key=len, reverse=True)
 
-    Args:
-        text: Sentence text to analyze.
 
-    Returns:
-        List of detection dictionaries strictly complying with shared_schema.json:
-        [{"source": "rules", "label": "attachment", "span": str, "confidence": None, "reason": str}]
-    """
-    if not text or not text.strip():
-        return []
+_VERBS = "|".join(_verb_forms(_VERB_BASES))
+_STOP = (r"(?:and|or|but|to|in|on|at|for|by|from|of|that|which|who|when|if|"
+         r"while|during|before|after|until|as|so|every|each|then|than|also)")
+_WORD = r"[A-Za-z][A-Za-z-]*"
 
-    if CLEAR_EXEMPTIONS.search(text):
-        return []
+# Nouns after "with the ..." that are almost never a competing attachment site.
+_EXCLUDED_PP_WORDS = {
+    "following", "same", "above", "exception", "help", "aid", "assistance",
+    "approval", "permission", "consent", "agreement", "knowledge",
+    "consideration", "regard", "respect",
+}
 
-    for pattern, reason_template in ATTACHMENT_PATTERNS:
-        match = re.search(pattern, text, re.IGNORECASE)
-        if match:
-            groups = match.groups()
-            span = groups[0] if groups else match.group(0)
-            subject = groups[1] if len(groups) > 1 else "the subject"
-            reason = reason_template.format(span=span, subject=subject)
-            return [{
-                "source": "rules",
-                "label": "attachment",
-                "span": span,
-                "confidence": None,
-                "reason": reason
-            }]
 
-    return []
+def _build_pattern(prepositions: Sequence[str]) -> "re.Pattern":
+    preps = "|".join(re.escape(p) for p in prepositions)
+    return re.compile(
+        rf"\b(?P<verb>{_VERBS})\s+"
+        rf"(?P<np>(?:the|a|an|each|every|all|his|her|their|its)\s+"
+        rf"(?:{_WORD}\s+){{0,2}}?{_WORD})\s+"
+        rf"(?P<pp>(?:{preps})\s+(?:the|a|an|his|her|their|its)\s+"
+        rf"(?:(?!{_STOP}\b){_WORD}\s+)?(?!{_STOP}\b){_WORD})",
+        re.IGNORECASE,
+    )
 
+
+_DEFAULT_PATTERN = _build_pattern(("with",))
+
+
+def detect_attachment(sentence: str, prepositions: Sequence[str] = ("with",)) -> List[Dict]:
+    pattern = _DEFAULT_PATTERN if tuple(prepositions) == ("with",) else _build_pattern(prepositions)
+    out = []
+    for m in pattern.finditer(sentence):
+        pp_words = {w.lower() for w in re.findall(_WORD, m.group("pp"))}
+        if pp_words & _EXCLUDED_PP_WORDS:
+            continue
+        reason = (
+            f'The phrase "{m.group("pp")}" may attach to the action "{m.group("verb")}" '
+            f'(how it is done) or to "{m.group("np")}" (describing it), '
+            f"which changes who or what is involved."
+        )
+        out.append(make_detection("attachment", sentence, m.start("pp"), m.end("pp"), reason))
+    return out
