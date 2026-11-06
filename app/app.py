@@ -721,6 +721,31 @@ def render_evaluation():
                     "Provenance / Status": meta.get("status", "genuine")
                 })
         st.dataframe(pd.DataFrame(comp_rows), use_container_width=True, hide_index=True)
+
+        # Model Trade-offs & Limitations
+        with st.expander("Engineering Trade-offs & Architectural Limitations", expanded=False):
+            t1, t2, t3 = st.columns(3)
+            with t1:
+                st.markdown(
+                    "**Rule-Based Detector**<br>"
+                    "- *Strengths:* Ultra-low latency (~0.2 ms), 0 hardware cost, fully deterministic.<br>"
+                    "- *Limitations:* Low recall (36.8% acc); brittle to non-templated phrasings.",
+                    unsafe_allow_html=True
+                )
+            with t2:
+                st.markdown(
+                    "**DistilBERT Classifier**<br>"
+                    "- *Strengths:* High macro F1 (0.9075), balanced across all 5 classes, local CPU/GPU.<br>"
+                    "- *Limitations:* Sentence-level label only (span is None); requires training split.",
+                    unsafe_allow_html=True
+                )
+            with t3:
+                st.markdown(
+                    "**Gemini Zero-Shot Baseline**<br>"
+                    "- *Strengths:* High macro F1 (0.9032), extracts exact span substrings and rationale.<br>"
+                    "- *Limitations:* Requires GEMINI_API_KEY; external API latency and rate limits.",
+                    unsafe_allow_html=True
+                )
         
         # Interactive Confusion Matrix
         st.markdown("### Measured Confusion Matrix")

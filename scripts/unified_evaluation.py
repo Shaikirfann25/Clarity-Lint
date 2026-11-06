@@ -66,7 +66,7 @@ def run_unified_evaluation(
     # -------------------------------------------------------------------------
     # 3. Zero-Shot Prompt Baseline (Gemini)
     # -------------------------------------------------------------------------
-    api_key = os.environ.get("GEMINI_API_KEY", "")
+    api_key = os.environ.get("GEMINI_API_KEY", "") or os.environ.get("GOOGLE_API_KEY", "")
     prompt_preds = []
     prompt_status = "offline_validation_baseline"
     prompt_runtime_ms = 0.0
@@ -78,18 +78,22 @@ def run_unified_evaluation(
         live_outputs = predict_zero_shot(df["text"].tolist(), delay=0.5)
         prompt_runtime_ms = (time.perf_counter() - t0) * 1000
         prompt_preds = [p["label"] for p in live_outputs]
-        prompt_status = "live_gemini_2.0_flash"
+        prompt_status = "live_gemini_benchmark"
     else:
-        existing_prompt_csv = output_dir / "prompt_baseline_predictions.csv"
-        if existing_prompt_csv.exists():
-            print("[Evaluation] Using packaged offline prompt baseline predictions...")
-            p_df = pd.read_csv(existing_prompt_csv)
-            # Match by sentence_id if possible
-            if "sentence_id" in p_df.columns and "prompt_pred" in p_df.columns:
-                p_map = dict(zip(p_df["sentence_id"], p_df["prompt_pred"]))
-                prompt_preds = [p_map.get(sid, "no_ambiguity") for sid in df["sentence_id"]]
-            else:
-                prompt_preds = p_df["prompt_pred"].tolist()[:len(df)]
+        existing_test_csv = output_dir / "prompt_baseline_test_predictions.csv"
+        existing_mock_csv = output_dir / "prompt_baseline_predictions.csv"
+        if existing_test_csv.exists():
+            print(f"[Evaluation] Using genuine Gemini benchmark predictions from {existing_test_csv.name}...")
+            p_df = pd.read_csv(existing_test_csv)
+            p_map = dict(zip(p_df["sentence_id"], p_df["prompt_pred"]))
+            prompt_preds = [p_map.get(sid, "no_ambiguity") for sid in df["sentence_id"]]
+            prompt_status = "gemini_zero_shot_benchmark (genuine)"
+        elif existing_mock_csv.exists():
+            print(f"[Evaluation] Using packaged offline mock baseline from {existing_mock_csv.name}...")
+            p_df = pd.read_csv(existing_mock_csv)
+            p_map = dict(zip(p_df["sentence_id"], p_df["prompt_pred"]))
+            prompt_preds = [p_map.get(sid, "no_ambiguity") for sid in df["sentence_id"]]
+            prompt_status = "offline_mock_baseline"
         else:
             print("[Evaluation] No prompt baseline predictions found; falling back to default.")
             prompt_preds = ["no_ambiguity"] * len(df)

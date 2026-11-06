@@ -5,64 +5,64 @@ S303,After the manager reviewed the intern's work she sent written feedback.,pro
 S324,When the senior analyst reviewed the junior analyst's work she found several errors.,pronoun,no_ambiguity,pronoun,0.6657,pronoun
 S390,The lead designer reviewed the associate's mockup and sent her a list of revisions.,pronoun,no_ambiguity,pronoun,0.6533,pronoun
 S398,The client reviewed the mockup and the designer updated it based on their comments.,pronoun,pronoun,pronoun,0.697,pronoun
-S377,The developer merged the branch and this caused an unexpected build failure.,pronoun,no_ambiguity,pronoun,0.6897,no_ambiguity
+S377,The developer merged the branch and this caused an unexpected build failure.,pronoun,no_ambiguity,pronoun,0.6897,pronoun
 S389,The mentor encouraged the mentee to present his work to the wider team.,pronoun,no_ambiguity,pronoun,0.68,pronoun
 S385,The editor gave the author feedback on his opening chapter.,pronoun,no_ambiguity,pronoun,0.5635,pronoun
 S321,After the project manager briefed the client he asked for a status update.,pronoun,no_ambiguity,pronoun,0.699,pronoun
 S363,The operator adjusted the parameter in the configuration file and reloaded it remotely.,pronoun,pronoun,attachment,0.4461,pronoun
-S374,The auditors discovered an irregularity and reported this to the oversight committee.,pronoun,no_ambiguity,pronoun,0.7085,no_ambiguity
+S374,The auditors discovered an irregularity and reported this to the oversight committee.,pronoun,no_ambiguity,pronoun,0.7085,pronoun
 S315,After Neha contacted Divya about the schedule she revised the project timeline.,pronoun,no_ambiguity,pronoun,0.6926,pronoun
 S395,The reviewer and the author discussed the findings and she requested additional citations.,pronoun,no_ambiguity,pronoun,0.6982,pronoun
 S352,The system detected an error in the log file and deleted it automatically.,pronoun,pronoun,pronoun,0.5737,pronoun
 S405,The researcher emailed the supervisor to say that she had completed the data collection.,pronoun,no_ambiguity,pronoun,0.6889,pronoun
-S054,Management expects consistent improvement from the team.,vague,no_ambiguity,vague,0.7302,no_ambiguity
-S023,The model must be lightweight enough for edge devices.,vague,no_ambiguity,vague,0.8327,no_ambiguity
-S003,The API should return results fast.,vague,vague,vague,0.8244,no_ambiguity
+S054,Management expects consistent improvement from the team.,vague,no_ambiguity,vague,0.7302,vague
+S023,The model must be lightweight enough for edge devices.,vague,no_ambiguity,vague,0.8327,vague
+S003,The API should return results fast.,vague,vague,vague,0.8244,vague
 S025,The CI build should succeed quickly for small changes.,vague,vague,vague,0.8426,vague
-S089,The site loads kind of slowly on mobile devices.,vague,no_ambiguity,no_ambiguity,0.3321,no_ambiguity
-S091,The product should work well with other software.,vague,no_ambiguity,vague,0.8387,no_ambiguity
-S076,The hospital must maintain adequate staffing levels.,vague,vague,vague,0.8332,no_ambiguity
-S088,The user should find the app easy to navigate.,vague,no_ambiguity,vague,0.8196,no_ambiguity
+S089,The site loads kind of slowly on mobile devices.,vague,no_ambiguity,no_ambiguity,0.3321,vague
+S091,The product should work well with other software.,vague,no_ambiguity,vague,0.8387,vague
+S076,The hospital must maintain adequate staffing levels.,vague,vague,vague,0.8332,vague
+S088,The user should find the app easy to navigate.,vague,no_ambiguity,vague,0.8196,vague
 S084,The contractor must meet reasonable performance benchmarks.,vague,vague,vague,0.8275,vague
-S021,The API documentation must be thorough.,vague,no_ambiguity,vague,0.85,no_ambiguity
-S062,The analysis produced fairly consistent results.,vague,no_ambiguity,vague,0.5066,no_ambiguity
+S021,The API documentation must be thorough.,vague,no_ambiguity,vague,0.85,vague
+S062,The analysis produced fairly consistent results.,vague,no_ambiguity,vague,0.5066,vague
 S073,The facility must maintain appropriate sanitation levels.,vague,vague,vague,0.8364,vague
-S015,The dashboard should load fast on all devices.,vague,vague,vague,0.8235,scope
-S095,The package should arrive within a few business days.,vague,no_ambiguity,vague,0.8019,no_ambiguity
-S053,The estimate for the task should be realistic.,vague,no_ambiguity,vague,0.841,no_ambiguity
-S153,He noticed the technician servicing the equipment in the storage area.,attachment,no_ambiguity,attachment,0.6205,pronoun
+S015,The dashboard should load fast on all devices.,vague,vague,vague,0.8235,vague
+S095,The package should arrive within a few business days.,vague,no_ambiguity,vague,0.8019,vague
+S053,The estimate for the task should be realistic.,vague,no_ambiguity,vague,0.841,vague
+S153,He noticed the technician servicing the equipment in the storage area.,attachment,no_ambiguity,attachment,0.6205,attachment
 S122,The analyst submitted the data with the correction notes.,attachment,no_ambiguity,attachment,0.5684,attachment
 S103,The detective found the suspect with the knife.,attachment,attachment,attachment,0.59,attachment
 S124,She reviewed the clause with the penalty conditions.,attachment,attachment,attachment,0.6652,attachment
 S188,The director approved the plan for the renovation with the reduced budget.,attachment,no_ambiguity,pronoun,0.62,attachment
-S192,She interviewed the senior managers and analysts about the project.,attachment,no_ambiguity,attachment,0.6137,pronoun
-S175,They only submitted the first module for review.,attachment,scope,scope,0.6951,pronoun
+S192,She interviewed the senior managers and analysts about the project.,attachment,no_ambiguity,attachment,0.6137,attachment
+S175,They only submitted the first module for review.,attachment,scope,scope,0.6951,scope
 S187,He attached the file to the email with the sensitive data.,attachment,no_ambiguity,attachment,0.6709,attachment
-S183,He noticed the error in the script written by the contractor.,attachment,no_ambiguity,attachment,0.5977,pronoun
+S183,He noticed the error in the script written by the contractor.,attachment,no_ambiguity,attachment,0.5977,attachment
 S121,She accepted the offer with the extended deadline.,attachment,no_ambiguity,attachment,0.6538,attachment
-S161,She submitted the draft to the editor that required significant revisions.,attachment,vague,attachment,0.6293,pronoun
-S172,She nearly missed every scheduled review.,attachment,no_ambiguity,attachment,0.4366,pronoun
+S161,She submitted the draft to the editor that required significant revisions.,attachment,vague,attachment,0.6293,attachment
+S172,She nearly missed every scheduled review.,attachment,no_ambiguity,attachment,0.4366,scope
 S115,She delivered the presentation with the new sales strategy.,attachment,no_ambiguity,attachment,0.6704,attachment
-S193,He distributed the updated report to the engineers and testers in the room.,attachment,no_ambiguity,attachment,0.6935,pronoun
-S152,She photographed the tourists visiting the old city walls.,attachment,no_ambiguity,attachment,0.6383,pronoun
-S254,A few modules were not fully tested in the regression cycle.,scope,no_ambiguity,scope,0.6896,scope
+S193,He distributed the updated report to the engineers and testers in the room.,attachment,no_ambiguity,attachment,0.6935,attachment
+S152,She photographed the tourists visiting the old city walls.,attachment,no_ambiguity,attachment,0.6383,attachment
+S254,A few modules were not fully tested in the regression cycle.,scope,no_ambiguity,scope,0.6896,vague
 S222,All participants must register online or in person before the deadline.,scope,no_ambiguity,scope,0.6324,scope
 S203,Not every feature must be completed before the deadline.,scope,no_ambiguity,scope,0.6254,scope
 S224,All employees must submit a report or attend the debrief session.,scope,no_ambiguity,scope,0.6648,scope
-S290,The alert is sent to the on-call engineer or to the backup contact.,scope,no_ambiguity,no_ambiguity,0.6588,scope
+S290,The alert is sent to the on-call engineer or to the backup contact.,scope,no_ambiguity,no_ambiguity,0.6588,no_ambiguity
 S292,All test cases did not pass on the initial automated run.,scope,scope,scope,0.7166,scope
 S277,Each component passed the functional test and the performance benchmark.,scope,no_ambiguity,scope,0.6907,no_ambiguity
 S289,Managers should report the incident to the HR team or to the legal department.,scope,no_ambiguity,vague,0.4598,no_ambiguity
-S285,Staff can request remote work on Mondays or on Fridays each week.,scope,no_ambiguity,scope,0.4806,no_ambiguity
+S285,Staff can request remote work on Mondays or on Fridays each week.,scope,no_ambiguity,scope,0.4806,scope
 S221,Every student must complete the exam or the practical assignment.,scope,no_ambiguity,scope,0.6282,scope
 S262,Employees should not share credentials or access rights with colleagues.,scope,no_ambiguity,scope,0.5113,scope
 S273,All students completed the quiz and the group assignment.,scope,no_ambiguity,scope,0.7287,scope
 S215,The policy does not apply to managers or senior directors.,scope,no_ambiguity,scope,0.5282,scope
 S295,Not all patches submitted in the last sprint were successfully reviewed.,scope,no_ambiguity,scope,0.7232,scope
-S253,Some features were excluded from the current release.,scope,no_ambiguity,scope,0.622,no_ambiguity
+S253,Some features were excluded from the current release.,scope,no_ambiguity,scope,0.622,vague
 S460,Select Export as PDF from the File menu to save a copy of the report.,no_ambiguity,no_ambiguity,no_ambiguity,0.7835,no_ambiguity
 S429,The red button on the left panel opens the emergency exit door.,no_ambiguity,no_ambiguity,no_ambiguity,0.7531,no_ambiguity
-S410,The database backup must run every night at 2:00 AM UTC.,no_ambiguity,no_ambiguity,no_ambiguity,0.775,scope
+S410,The database backup must run every night at 2:00 AM UTC.,no_ambiguity,no_ambiguity,no_ambiguity,0.775,no_ambiguity
 S431,The project was completed three weeks ahead of the original delivery date.,no_ambiguity,no_ambiguity,no_ambiguity,0.4366,no_ambiguity
 S495,The maximum file name length on NTFS is 255 Unicode characters.,no_ambiguity,no_ambiguity,no_ambiguity,0.8148,no_ambiguity
 S499,"The test pipeline must pass on Python 3.9, 3.10, and 3.11 before any release is tagged.",no_ambiguity,no_ambiguity,no_ambiguity,0.8031,no_ambiguity
@@ -74,4 +74,4 @@ S468,The blue folder on the top shelf of the left cabinet contains the signed co
 S479,The test on line 89 verifies that the login endpoint returns a 401 for invalid credentials.,no_ambiguity,no_ambiguity,no_ambiguity,0.8106,no_ambiguity
 S422,The system must send an email confirmation within 60 seconds of registration.,no_ambiguity,no_ambiguity,no_ambiguity,0.5717,no_ambiguity
 S500,The bar chart shows revenue increased by exactly 15 percent from Q1 to Q2 of 2024.,no_ambiguity,no_ambiguity,no_ambiguity,0.7786,no_ambiguity
-S459,Close all running applications before launching the system updater.,no_ambiguity,no_ambiguity,no_ambiguity,0.5206,scope
+S459,Close all running applications before launching the system updater.,no_ambiguity,no_ambiguity,no_ambiguity,0.5206,no_ambiguity
