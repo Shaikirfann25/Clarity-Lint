@@ -21,6 +21,7 @@ from src.explanations.explain import explain
 from src.explanations.rewrite import rewrite
 from src.explanations.templates import LABELS, TEMPLATES, get_template
 from src.explanations.baseline import (
+    call_gemini,
     classify_sentence,
     parse_llm_response,
     predict_zero_shot,
@@ -574,4 +575,71 @@ class TestPredictZeroShot:
 
         results = predict_zero_shot(["Clear sentence."], llm_fn=mock_llm, source="my_custom_prompt")
         assert results[0]["source"] == "my_custom_prompt"
+
+    def test_call_gemini_missing_api_key_raises_env_error(self, monkeypatch):
+        monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+        with pytest.raises(EnvironmentError, match="GEMINI_API_KEY"):
+            call_gemini("Any sentence")
+
+    def test_predict_zero_shot_missing_api_key_graceful_fallback(self, monkeypatch):
+        monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+        # Calling without llm_fn uses call_gemini, which fails due to missing key.
+        results = predict_zero_shot(["Any test sentence without key."])
+        assert len(results) == 1
+        assert results[0]["source"] == "prompt_baseline"
+        assert results[0]["label"] == "no_ambiguity"
+        assert results[0]["span"] is None
+        assert results[0]["confidence"] is None
+        assert "GEMINI_API_KEY" in results[0]["reason"]
+
+    def test_predict_zero_shot_invalid_output_garbage_json(self):
+        def mock_garbage(s: str) -> str:
+            return "This is completely invalid and not JSON."
+
+        results = predict_zero_shot(["Sentence."], llm_fn=mock_garbage)
+        assert len(results) == 1
+        assert results[0]["source"] == "prompt_baseline"
+        assert results[0]["label"] == "no_ambiguity"
+        assert results[0]["span"] is None
+        assert "could not be validated" in results[0]["reason"]
+
+    def test_predict_zero_shot_invalid_label(self):
+        def mock_bad_label(s: str) -> str:
+            return json.dumps({"label": "hallucinated_category", "span": None, "reason": "x"})
+
+        results = predict_zero_shot(["Sentence."], llm_fn=mock_bad_label)
+        assert len(results) == 1
+        assert results[0]["source"] == "prompt_baseline"
+        assert results[0]["label"] == "no_ambiguity"
+        assert "Invalid label" in results[0]["reason"]
+
+    def test_predict_zero_shot_hallucinated_span_stripped(self):
+        def mock_bad_span(s: str) -> str:
+            return json.dumps({
+                "label": "vague",
+                "span": "not_in_the_sentence",
+                "reason": "Vague word.",
+            })
+
+        results = predict_zero_shot(["The system should respond soon."], llm_fn=mock_bad_span)
+        assert len(results) == 1
+        assert results[0]["label"] == "vague"
+        # The hallucinated span should be stripped to None
+        assert results[0]["span"] is None
+
+    def test_predict_zero_shot_api_http_error(self):
+        import requests
+
+        def mock_http_err(s: str) -> str:
+            resp = requests.Response()
+            resp.status_code = 500
+            resp.reason = "Internal Server Error"
+            raise requests.HTTPError("500 Server Error", response=resp)
+
+        results = predict_zero_shot(["Sentence."], llm_fn=mock_http_err)
+        assert len(results) == 1
+        assert results[0]["source"] == "prompt_baseline"
+        assert results[0]["label"] == "no_ambiguity"
+        assert results[0]["span"] is None
+        assert "500 Server Error" in results[0]["reason"]
 

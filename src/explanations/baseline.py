@@ -182,14 +182,14 @@ def validate_prediction(
 
 # ── LLM caller ───────────────────────────────────────────────────────────
 
-def call_gemini(sentence: str, *, model_name: str = "gemini-2.0-flash") -> str:
+def call_gemini(sentence: str, *, model_name: str = "gemini-3.1-flash-lite") -> str:
     """Send *sentence* to Google Gemini and return the raw text response.
 
     Supports both the ``google-generativeai`` SDK and direct REST calls
     via ``requests`` when the SDK is not installed.
-    Requires a valid ``GEMINI_API_KEY`` environment variable.
+    Requires a valid ``GEMINI_API_KEY`` (or ``GOOGLE_API_KEY``) environment variable.
     """
-    api_key = os.environ.get("GEMINI_API_KEY", "")
+    api_key = os.environ.get("GEMINI_API_KEY", "") or os.environ.get("GOOGLE_API_KEY", "")
     if not api_key:
         raise EnvironmentError(
             "GEMINI_API_KEY environment variable is not set.  "
@@ -229,17 +229,31 @@ def call_gemini(sentence: str, *, model_name: str = "gemini-2.0-flash") -> str:
                 "maxOutputTokens": 256
             }
         }
-        resp = requests.post(url, json=payload, timeout=30)
-        resp.raise_for_status()
-        data = resp.json()
-        return data["candidates"][0]["content"]["parts"][0]["text"]
+        max_retries = 3
+        backoff = 2.0
+        for attempt in range(max_retries):
+            try:
+                resp = requests.post(url, json=payload, timeout=30)
+                if resp.status_code in (429, 503) and attempt < max_retries - 1:
+                    time.sleep(backoff)
+                    backoff *= 2
+                    continue
+                resp.raise_for_status()
+                data = resp.json()
+                return data["candidates"][0]["content"]["parts"][0]["text"]
+            except requests.RequestException as e:
+                if attempt < max_retries - 1:
+                    time.sleep(backoff)
+                    backoff *= 2
+                    continue
+                raise
 
 
 def classify_sentence(
     sentence: str,
     *,
     llm_fn=None,
-    model_name: str = "gemini-2.0-flash",
+    model_name: str = "gemini-3.1-flash-lite",
 ) -> dict[str, Any]:
     """Classify a single sentence via the zero-shot prompt.
 
@@ -265,11 +279,12 @@ def classify_sentence(
     try:
         raw = caller(sentence)
     except Exception as exc:
+        clean_msg = re.sub(r"key=[^&\s\"']+", "key=[REDACTED]", str(exc))
         return {
             "label": "no_ambiguity",
             "span": None,
             "confidence": None,
-            "reason": f"LLM call failed: {exc}",
+            "reason": f"LLM call failed: {clean_msg}",
             "valid": False,
             "source": "prompt",
         }
@@ -286,7 +301,7 @@ def predict_zero_shot(
     sentences: list[str],
     *,
     llm_fn=None,
-    model_name: str = "gemini-2.0-flash",
+    model_name: str = "gemini-3.1-flash-lite",
     delay: float = 0.0,
     source: str = "prompt_baseline",
 ) -> list[dict[str, Any]]:
@@ -354,7 +369,7 @@ def run_baseline(
     label_col: str = "label",
     id_col: str = "sentence_id",
     llm_fn=None,
-    model_name: str = "gemini-2.0-flash",
+    model_name: str = "gemini-3.1-flash-lite",
     delay: float = 0.5,
 ) -> pd.DataFrame:
     """Run the prompt baseline on every row of *df*.
@@ -430,7 +445,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--model",
-        default="gemini-2.0-flash",
+        default="gemini-3.1-flash-lite",
         help="Gemini model name.",
     )
     parser.add_argument(
