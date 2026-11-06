@@ -1,89 +1,293 @@
 {
-  "prompt_pred": {
-    "n_examples": 76,
-    "accuracy": 0.631578947368421,
-    "macro_f1": 0.6085875084786155,
-    "per_class": {
-      "no_ambiguity": {
-        "precision": 0.43333333333333335,
-        "recall": 0.8666666666666667,
-        "f1-score": 0.5777777777777777,
-        "support": 15.0
+  "dataset_provenance": {
+    "test_split_path": "data\\splits\\test.csv",
+    "total_examples": 76,
+    "canonical_labels": [
+      "no_ambiguity",
+      "vague",
+      "attachment",
+      "scope",
+      "pronoun"
+    ],
+    "class_distribution": {
+      "pronoun": 16,
+      "vague": 15,
+      "attachment": 15,
+      "scope": 15,
+      "no_ambiguity": 15
+    },
+    "timestamp": "2026-11-06 08:53:23 UTC"
+  },
+  "methods": {
+    "rules_pred": {
+      "meta": {
+        "name": "Rule-Based Detector",
+        "type": "Linguistic Grammar & Lexicons",
+        "status": "genuine_verified",
+        "runtime_ms": 6.82,
+        "per_sample_ms": 0.09
       },
-      "vague": {
-        "precision": 1.0,
-        "recall": 0.2,
-        "f1-score": 0.3333333333333333,
-        "support": 15.0
+      "accuracy": 0.3684,
+      "macro_f1": 0.3386,
+      "weighted_f1": 0.3394,
+      "per_class": {
+        "no_ambiguity": {
+          "precision": 0.2459,
+          "recall": 1.0,
+          "f1": 0.3947,
+          "support": 15
+        },
+        "vague": {
+          "precision": 0.8571,
+          "recall": 0.4,
+          "f1": 0.5455,
+          "support": 15
+        },
+        "attachment": {
+          "precision": 1.0,
+          "recall": 0.1333,
+          "f1": 0.2353,
+          "support": 15
+        },
+        "scope": {
+          "precision": 0.5,
+          "recall": 0.0667,
+          "f1": 0.1176,
+          "support": 15
+        },
+        "pronoun": {
+          "precision": 1.0,
+          "recall": 0.25,
+          "f1": 0.4,
+          "support": 16
+        }
       },
-      "attachment": {
-        "precision": 1.0,
-        "recall": 0.4666666666666667,
-        "f1-score": 0.6363636363636364,
-        "support": 15.0
-      },
-      "scope": {
-        "precision": 0.7857142857142857,
-        "recall": 0.7333333333333333,
-        "f1-score": 0.7586206896551724,
-        "support": 15.0
-      },
-      "pronoun": {
-        "precision": 0.6363636363636364,
-        "recall": 0.875,
-        "f1-score": 0.7368421052631579,
-        "support": 16.0
-      },
-      "accuracy": 0.631578947368421,
-      "macro avg": {
-        "precision": 0.771082251082251,
-        "recall": 0.6283333333333333,
-        "f1-score": 0.6085875084786155,
-        "support": 76.0
-      },
-      "weighted avg": {
-        "precision": 0.7693096377306903,
-        "recall": 0.631578947368421,
-        "f1-score": 0.6102750689626227,
-        "support": 76.0
+      "confusion_matrix": {
+        "labels": [
+          "no_ambiguity",
+          "vague",
+          "attachment",
+          "scope",
+          "pronoun"
+        ],
+        "matrix": [
+          [
+            15,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            9,
+            6,
+            0,
+            0,
+            0
+          ],
+          [
+            11,
+            1,
+            2,
+            1,
+            0
+          ],
+          [
+            14,
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            12,
+            0,
+            0,
+            0,
+            4
+          ]
+        ]
       }
     },
-    "confusion_matrix": [
-      [
-        13,
-        0,
-        0,
-        2,
-        0
-      ],
-      [
-        11,
-        3,
-        0,
-        1,
-        0
-      ],
-      [
-        0,
-        0,
-        7,
-        0,
-        8
-      ],
-      [
-        4,
-        0,
-        0,
-        11,
-        0
-      ],
-      [
-        2,
-        0,
-        0,
-        0,
-        14
-      ]
-    ]
+    "model_pred": {
+      "meta": {
+        "name": "DistilBERT Classifier",
+        "type": "Fine-Tuned Transformer",
+        "status": "genuine_verified",
+        "runtime_ms": 5512.53,
+        "per_sample_ms": 72.533
+      },
+      "accuracy": 0.9079,
+      "macro_f1": 0.9075,
+      "weighted_f1": 0.9079,
+      "per_class": {
+        "no_ambiguity": {
+          "precision": 0.875,
+          "recall": 0.9333,
+          "f1": 0.9032,
+          "support": 15
+        },
+        "vague": {
+          "precision": 0.9333,
+          "recall": 0.9333,
+          "f1": 0.9333,
+          "support": 15
+        },
+        "attachment": {
+          "precision": 0.8667,
+          "recall": 0.8667,
+          "f1": 0.8667,
+          "support": 15
+        },
+        "scope": {
+          "precision": 0.9286,
+          "recall": 0.8667,
+          "f1": 0.8966,
+          "support": 15
+        },
+        "pronoun": {
+          "precision": 0.9375,
+          "recall": 0.9375,
+          "f1": 0.9375,
+          "support": 16
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "no_ambiguity",
+          "vague",
+          "attachment",
+          "scope",
+          "pronoun"
+        ],
+        "matrix": [
+          [
+            14,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            14,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            13,
+            1,
+            1
+          ],
+          [
+            1,
+            1,
+            0,
+            13,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            15
+          ]
+        ]
+      }
+    },
+    "prompt_pred": {
+      "meta": {
+        "name": "Zero-Shot Baseline (Gemini)",
+        "type": "LLM Zero-Shot Prompt",
+        "status": "offline_validation_baseline",
+        "runtime_ms": 0.0,
+        "per_sample_ms": null
+      },
+      "accuracy": 0.6316,
+      "macro_f1": 0.6086,
+      "weighted_f1": 0.6103,
+      "per_class": {
+        "no_ambiguity": {
+          "precision": 0.4333,
+          "recall": 0.8667,
+          "f1": 0.5778,
+          "support": 15
+        },
+        "vague": {
+          "precision": 1.0,
+          "recall": 0.2,
+          "f1": 0.3333,
+          "support": 15
+        },
+        "attachment": {
+          "precision": 1.0,
+          "recall": 0.4667,
+          "f1": 0.6364,
+          "support": 15
+        },
+        "scope": {
+          "precision": 0.7857,
+          "recall": 0.7333,
+          "f1": 0.7586,
+          "support": 15
+        },
+        "pronoun": {
+          "precision": 0.6364,
+          "recall": 0.875,
+          "f1": 0.7368,
+          "support": 16
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "no_ambiguity",
+          "vague",
+          "attachment",
+          "scope",
+          "pronoun"
+        ],
+        "matrix": [
+          [
+            13,
+            0,
+            0,
+            2,
+            0
+          ],
+          [
+            11,
+            3,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            7,
+            0,
+            8
+          ],
+          [
+            4,
+            0,
+            0,
+            11,
+            0
+          ],
+          [
+            2,
+            0,
+            0,
+            0,
+            14
+          ]
+        ]
+      }
+    }
   }
 }
