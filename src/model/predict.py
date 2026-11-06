@@ -81,6 +81,9 @@ def predict(sentences: Union[List[str], str], model_dir: Path | str | None = Non
     if isinstance(sentences, str):
         sentences = [sentences]
 
+    # Filter out empty / whitespace-only strings
+    sentences = [s for s in sentences if isinstance(s, str) and s.strip()]
+
     if not sentences:
         return []
 
