@@ -108,11 +108,11 @@ The prompt baseline (`src/explanations/baseline.py`) evaluates how a state-of-th
 > ```
 
 ### 5.1 Architecture & Settings
-- **Model:** Google Gemini (`gemini-2.0-flash`, configurable via `--model`).
+- **Model:** Google Gemini (`gemini-3.1-flash-lite`, configurable via `--model`).
 - **Temperature:** `0` (deterministic sampling).
 - **Token Limit:** `256` output tokens.
 - **Protocol:** Zero-shot with task description, label definitions, few-shot illustrative examples, and JSON schema constraints.
-- **API Access:** Reads `GEMINI_API_KEY` from the environment. Supports both `google-generativeai` SDK and raw HTTP REST via `requests` (no missing dependency failures).
+- **API Access:** Reads `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) from the environment. Supports direct REST calls via `requests` and `google-generativeai` SDK. Includes automated backoff retry logic for rate limits (429) and temporary service unavailability (503).
 
 ### 5.2 System Prompt Structure
 ```text
@@ -157,6 +157,28 @@ This is exported via `src/explanations/__init__.py`. Each dictionary in the retu
 - `confidence`: `None` (baseline model does not fabricate confidence scores)
 - `reason`: Explanation string
 
+### 5.5 Genuine Gemini API Benchmark vs. Mock Baseline
+
+To ensure complete transparency and integrity in our comparative evaluation:
+
+| Attribute | Mock / Offline Baseline (`outputs/prompt_baseline_predictions.csv`) | Genuine Live API Benchmark (`outputs/prompt_baseline_test_predictions.csv`) |
+|---|---|---|
+| **Execution Mode** | Simulated offline heuristics (`--mock`) | Real Google Gemini API calls |
+| **Model Used** | Rule-based regex simulation | `gemini-3.1-flash-lite` (Temperature 0) |
+| **Date Executed** | October 31, 2026 | November 6, 2026 |
+| **Evaluation Set** | Frozen `data/splits/test.csv` (76 examples) | Frozen `data/splits/test.csv` (76 examples) |
+| **Accuracy** | 63.16% (48/76) | **90.79%** (69/76) |
+| **Macro F1** | 0.6086 | **0.9032** |
+| **Weighted F1** | 0.6103 | **0.9045** |
+| **Per-Class F1** | `pronoun`: 0.7368<br>`vague`: 0.3333<br>`attachment`: 0.6364<br>`scope`: 0.7586<br>`no_ambiguity`: 0.5778 | `pronoun`: **1.0000**<br>`vague`: **0.9375**<br>`attachment`: **0.9286**<br>`scope`: **0.7407**<br>`no_ambiguity`: **0.9091** |
+| **Failed Requests** | 0 | 2 requests (`S460`, `S429`) hit rate-limiting (HTTP 429) and safely fell back to `no_ambiguity` |
+| **Report File** | `outputs/evaluation_report.json` | `outputs/prompt_baseline_test_evaluation_report.json` |
+
+#### Limitations & Error Analysis:
+1. **API Rate Limiting:** On the standard Gemini free tier, bursts of requests can trigger HTTP 429 rate limits. During the 76-sentence batch, 2 requests encountered rate limits and were safely caught by our fallback mechanism without halting pipeline execution.
+2. **Scope Ambiguity:** Scope ambiguity remained the hardest category for zero-shot prompt classification (F1: 0.7407), where quantifier and negation scopes (`not`, `all`, `every`) occasionally overlap with `no_ambiguity` or `vague`.
+3. **Pronoun & Vague Precision:** The zero-shot prompt showed exceptional capability on `pronoun` ambiguity (100% precision, 100% recall) and `vague` terms (100% recall, 93.75% F1).
+
 ---
 
 ## 6. Verification and Integration Hand-off
@@ -179,11 +201,16 @@ predictions = predict_zero_shot(sentences)
 ```
 
 ### 6.2 Evaluation CSV Schema
-The prompt baseline produces a CSV ready for `evaluation/evaluate.py`:
+The prompt baseline outputs CSV files ready for `evaluation/evaluate.py`:
+- `outputs/prompt_baseline_predictions.csv`: Packaged offline mock baseline (for testing without external network).
+- `outputs/prompt_baseline_test_predictions.csv`: Genuine Google Gemini zero-shot baseline predictions.
+- `outputs/prompt_baseline_test_evaluation_report.json`: Metrics report generated from live API predictions.
+
+Columns in both files:
 - `sentence_id`: Unique identifier (e.g. `S001`).
 - `text`: Sentence string.
 - `gold_label`: Human ground-truth annotation.
-- `prompt_pred`: Predicted label (generated via offline mock in the committed file; real Gemini when run with API key).
+- `prompt_pred`: Predicted label.
 - `span`: Extracted evidence substring or null.
 - `reason`: Model explanation.
 - `valid`: Boolean indicating schema compliance.
