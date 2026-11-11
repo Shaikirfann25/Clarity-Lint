@@ -647,151 +647,279 @@ def render_document():
         st.download_button("Download document report (CSV)", data=pd.DataFrame(table_rows).to_csv(index=False), file_name="clarity_lint_document_report.csv", mime="text/csv")
 
 def render_evaluation():
-    hero("Evaluation lab / 04", "Measure what matters.", "Identical held-out test examples (76 sentences, 5 canonical labels) evaluated across Rule-Based Detection, DistilBERT Classifier, and Zero-Shot Prompt Baseline.")
-    
-    report_file = ROOT / "outputs" / "evaluation_report.json"
-    unified_csv_file = ROOT / "outputs" / "unified_test_evaluation.csv"
-    
-    uploaded = st.file_uploader("Load evaluation CSV (optional)", type=["csv"], key="eval_csv")
+    hero(
+        "Evaluation lab / 04",
+        "Measure what matters.",
+        "Evidence-aware evaluation using the frozen test set. "
+        "Rules and valid cached Gemini predictions are compared on "
+        "the same examples. DistilBERT remains unavailable until its "
+        "trained checkpoint is supplied."
+    )
+
+    report_file = ROOT / "outputs" / "integration_comparative_report.json"
+    predictions_file = ROOT / "outputs" / "integration_comparative_predictions.csv"
+
+    uploaded = st.file_uploader(
+        "Load evaluation CSV (optional)",
+        type=["csv"],
+        key="eval_csv"
+    )
+
     if uploaded:
         df = pd.read_csv(uploaded)
         st.write("Preview", df.head(8))
-        required = {"gold_label"}
-        if not required.issubset(df.columns):
-            st.error("CSV needs a gold_label column. Add prediction columns named rules_pred, model_pred, prompt_pred to compare methods.")
+
+        if "gold_label" not in df.columns:
+            st.error("CSV needs a gold_label column.")
         else:
-            pred_cols = [c for c in ["rules_pred","model_pred","prompt_pred"] if c in df.columns]
+            pred_cols = [
+                c for c in ["rules_pred", "model_pred", "prompt_pred"]
+                if c in df.columns
+            ]
             if pred_cols:
-                metrics, reports = evaluate_predictions(df, pred_cols)
-                for method, report in reports.items():
-                    st.markdown(f"### {method}")
-                    st.json(report)
-            else: st.info("No recognized prediction columns found.")
-    elif report_file.exists() and unified_csv_file.exists():
+                try:
+                    metrics, reports = evaluate_predictions(df, pred_cols)
+                    for method, report in reports.items():
+                        st.markdown(f"### {method}")
+                        st.json(report)
+                except (ValueError, KeyError) as exc:
+                    st.error(f"Could not evaluate this CSV: {exc}")
+            else:
+                st.info("No recognized prediction columns found.")
+
+    elif report_file.exists() and predictions_file.exists():
         with open(report_file, "r", encoding="utf-8") as f:
-            eval_data = json.load(f)
-        
-        prov = eval_data.get("dataset_provenance", {})
-        methods_data = eval_data.get("methods", {})
-        
-        st.success(f"âœ… Loaded verified test evaluation on {prov.get('total_examples', 76)} held-out examples ({prov.get('test_split_path', 'data/splits/test.csv')}). Zero data leakage.")
-        
-        # 3-Model Cards
-        c1, c2, c3 = st.columns(3)
-        col_map = [
-            (c1, "rules_pred", "RULE-BASED DETECTOR", "Linguistic rules"),
-            (c2, "model_pred", "DISTILBERT CLASSIFIER", "Fine-tuned neural model"),
-            (c3, "prompt_pred", "ZERO-SHOT BASELINE (GEMINI)", "LLM prompt baseline")
+            report = json.load(f)
+
+        methods = report.get("methods", {})
+        dataset = report.get("dataset", {})
+        provenance = report.get("provenance", {})
+
+        st.success(
+            "Loaded evidence-aware evaluation: "
+            f"{dataset.get('total_examples', 0)} frozen test examples. "
+            f"Rules/Gemini common comparison: "
+            f"{dataset.get('comparison_examples', 0)} examples."
+        )
+
+        st.caption(
+            "Gemini results use valid cached API responses, not a fresh live run. "
+            "Cached DistilBERT predictions are not scored because the current "
+            "workspace does not contain its model weights."
+        )
+
+        # Primary comparison: same examples for both evaluated methods.
+        st.markdown("### Fair comparison — identical test examples")
+
+        comparison_keys = [
+            ("rules_common_74", "RULE-BASED DETECTOR", "Fresh rule predictions"),
+            ("gemini_valid_common", "GEMINI ZERO-SHOT", "Valid cached predictions"),
+            ("distilbert", "DISTILBERT", "Checkpoint unavailable"),
         ]
-        
-        for col, key, title, desc in col_map:
-            m = methods_data.get(key, {})
-            meta = m.get("meta", {})
-            f1 = m.get("macro_f1", 0.0)
-            acc = m.get("accuracy", 0.0)
-            runtime = meta.get("per_sample_ms", 0.0)
-            status_tag = meta.get("status", "measured")
+
+        columns = st.columns(3)
+
+        for col, (key, title, description) in zip(columns, comparison_keys):
+            method = methods.get(key, {})
+            with col:
+                if method.get("metrics") is None and "accuracy" not in method:
+                    st.markdown(
+                        f"<div class='panel'>"
+                        f"<div class='panel-title'>{title}</div>"
+                        f"<h3>Unavailable</h3>"
+                        f"<p class='small-muted'>{description}</p>"
+                        f"<div class='gold-line'></div>"
+                        f"<p>{method.get('note', method.get('status', 'No verified metrics available.'))}</p>"
+                        f"</div>",
+                        unsafe_allow_html=True
+                    )
+                else:
+                    st.markdown(
+                        f"<div class='panel'>"
+                        f"<div class='panel-title'>{title}</div>"
+                        f"<h3>Macro-F1: {method['macro_f1']:.4f}</h3>"
+                        f"<p class='small-muted'>"
+                        f"Accuracy: {method['accuracy'] * 100:.2f}%"
+                        f" | n={method['n_examples']}<br>"
+                        f"{description}</p>"
+                        f"<div class='gold-line'></div>"
+                        f"<p>Macro Precision: {method['macro_precision']:.4f}<br>"
+                        f"Macro Recall: {method['macro_recall']:.4f}<br>"
+                        f"Weighted F1: {method['weighted_f1']:.4f}</p>"
+                        f"</div>",
+                        unsafe_allow_html=True
+                    )
+
+        # Full 76-example rule result is separate from the common comparison.
+        rules_all = methods.get("rules_all_76", {})
+        if rules_all:
+            st.markdown("### Rule detector — complete frozen test set")
+            st.dataframe(
+                pd.DataFrame([{
+                    "Examples": rules_all.get("n_examples"),
+                    "Accuracy": rules_all.get("accuracy"),
+                    "Macro Precision": rules_all.get("macro_precision"),
+                    "Macro Recall": rules_all.get("macro_recall"),
+                    "Macro F1": rules_all.get("macro_f1"),
+                    "Weighted F1": rules_all.get("weighted_f1"),
+                    "Runtime (ms)": rules_all.get("runtime_ms"),
+                    "Latency (ms/sample)": rules_all.get("per_sample_ms"),
+                    "Status": rules_all.get("status"),
+                }]),
+                use_container_width=True,
+                hide_index=True
+            )
+
+        # Comparative table.
+        st.markdown("### Comparative metrics")
+        comparison_rows = []
+
+        for key in ["rules_common_74", "gemini_valid_common"]:
+            method = methods.get(key)
+            if not method:
+                continue
+
+            comparison_rows.append({
+                "Method": key,
+                "Examples": method.get("n_examples"),
+                "Accuracy": method.get("accuracy"),
+                "Macro Precision": method.get("macro_precision"),
+                "Macro Recall": method.get("macro_recall"),
+                "Macro F1": method.get("macro_f1"),
+                "Weighted F1": method.get("weighted_f1"),
+                "Latency (ms/sample)": method.get("per_sample_ms"),
+                "Status": method.get("status"),
+            })
+
+        if comparison_rows:
+            st.dataframe(
+                pd.DataFrame(comparison_rows),
+                use_container_width=True,
+                hide_index=True
+            )
+
+        # Confusion matrices are available only for evaluated methods.
+        st.markdown("### Confusion matrix and per-class metrics")
+        available_methods = [
+            key for key in ["rules_all_76", "rules_common_74", "gemini_valid_common"]
+            if methods.get(key, {}).get("confusion_matrix")
+        ]
+
+        if available_methods:
+            chosen_method = st.selectbox(
+                "Select evaluated method",
+                available_methods,
+                format_func=lambda key: {
+                    "rules_all_76": "Rules — all 76 examples",
+                    "rules_common_74": "Rules — common 74 examples",
+                    "gemini_valid_common": "Gemini — valid common 74 examples",
+                }.get(key, key),
+                key="evidence_confusion_method"
+            )
+
+            selected = methods[chosen_method]
+            cm_data = selected["confusion_matrix"]
+            cm_labels = cm_data.get("labels", LABELS)
+            cm = cm_data["matrix"]
+
+            fig = px.imshow(
+                cm,
+                x=cm_labels,
+                y=cm_labels,
+                text_auto=True,
+                aspect="auto",
+                color_continuous_scale=["#102820", "#c5a45d"]
+            )
+            fig.update_layout(
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                font_color="#e9dfc8",
+                xaxis_title="Predicted label",
+                yaxis_title="Gold label"
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
+            st.markdown("#### Per-class breakdown")
+            per_class = selected.get("per_class", {})
+            rows = [
+                {
+                    "Class": label,
+                    "Precision": per_class[label]["precision"],
+                    "Recall": per_class[label]["recall"],
+                    "F1": per_class[label]["f1"],
+                    "Support": per_class[label]["support"],
+                }
+                for label in cm_labels if label in per_class
+            ]
+            st.dataframe(
+                pd.DataFrame(rows),
+                use_container_width=True,
+                hide_index=True
+            )
+
+        # Provenance and limitations.
+        with st.expander("Prediction provenance and limitations", expanded=False):
+            st.write("Rules:", provenance.get("rules", "Not recorded"))
+            st.write("Gemini:", provenance.get("gemini", "Not recorded"))
+            st.write("DistilBERT:", provenance.get("distilbert", "Not recorded"))
+            st.write(
+                "Gemini invalid rows excluded:",
+                provenance.get("gemini_invalid_rows_excluded", "Not recorded")
+            )
+            st.write(
+                "DistilBERT cache alignment:",
+                provenance.get("distilbert_cache_alignment", "Not recorded")
+            )
+            for limitation in report.get("limitations", []):
+                st.warning(limitation)
+
+        with open(predictions_file, "rb") as fp:
+            st.download_button(
+                "Download Evidence-Aware Predictions (CSV)",
+                data=fp.read(),
+                file_name="integration_comparative_predictions.csv",
+                mime="text/csv"
+            )
+
+        with open(report_file, "rb") as fp:
+            st.download_button(
+                "Download Evidence-Aware Evaluation Report (JSON)",
+                data=fp.read(),
+                file_name="integration_comparative_report.json",
+                mime="application/json"
+            )
+
+    else:
+        metrics = make_demo_predictions()
+        st.warning(
+            "Demo mode: no measured integration report was found. "
+            "All metrics below are illustrative fixtures, not actual results."
+        )
+        columns = st.columns(3)
+        for col, method in zip(columns, ["rules_pred", "model_pred", "prompt_pred"]):
             with col:
                 st.markdown(
                     f"<div class='panel'>"
-                    f"<div class='panel-title'>{title}</div>"
-                    f"<h3>Macro-F1: {f1:.4f}</h3>"
-                    f"<p class='small-muted'>Accuracy: {acc*100:.1f}% | {desc}</p>"
+                    f"<div class='panel-title'>{method.replace('_', ' ').upper()}</div>"
+                    f"<h3>Illustrative only</h3>"
+                    f"<p class='small-muted'>Not measured test-set performance.</p>"
                     f"<div class='gold-line'></div>"
-                    f"<p>Latency: {runtime if runtime is not None else 'N/A'} ms/item<br>"
-                    f"<span class='pill'>{status_tag}</span></p>"
+                    f"<p>Macro-F1 fixture: {metrics[method]['macro_f1']:.2f}</p>"
                     f"</div>",
                     unsafe_allow_html=True
                 )
-        
-        # Comparison Table
-        st.markdown("### Unified Three-Method Comparison")
-        comp_rows = []
-        for key in ["rules_pred", "model_pred", "prompt_pred"]:
-            if key in methods_data:
-                m = methods_data[key]
-                meta = m.get("meta", {})
-                comp_rows.append({
-                    "Method": meta.get("name", key),
-                    "Architecture": meta.get("type", "â€”"),
-                    "Accuracy": f"{m.get('accuracy', 0.0)*100:.2f}%",
-                    "Macro F1": f"{m.get('macro_f1', 0.0):.4f}",
-                    "Weighted F1": f"{m.get('weighted_f1', 0.0):.4f}",
-                    "Latency (ms/sample)": meta.get("per_sample_ms", "N/A"),
-                    "Provenance / Status": meta.get("status", "genuine")
-                })
-        st.dataframe(pd.DataFrame(comp_rows), use_container_width=True, hide_index=True)
 
-        # Model Trade-offs & Limitations
-        with st.expander("Engineering Trade-offs & Architectural Limitations", expanded=False):
-            t1, t2, t3 = st.columns(3)
-            with t1:
-                st.markdown(
-                    "**Rule-Based Detector**<br>"
-                    "- *Strengths:* Ultra-low latency (~0.2 ms), 0 hardware cost, fully deterministic.<br>"
-                    "- *Limitations:* Low recall (36.8% acc); brittle to non-templated phrasings.",
-                    unsafe_allow_html=True
-                )
-            with t2:
-                st.markdown(
-                    "**DistilBERT Classifier**<br>"
-                    "- *Strengths:* High macro F1 (0.9075), balanced across all 5 classes, local CPU/GPU.<br>"
-                    "- *Limitations:* Sentence-level label only (span is None); requires training split.",
-                    unsafe_allow_html=True
-                )
-            with t3:
-                st.markdown(
-                    "**Gemini Zero-Shot Baseline**<br>"
-                    "- *Strengths:* High macro F1 (0.9032), extracts exact span substrings and rationale.<br>"
-                    "- *Limitations:* Requires GEMINI_API_KEY; external API latency and rate limits.",
-                    unsafe_allow_html=True
-                )
-        
-        # Interactive Confusion Matrix
-        st.markdown("### Measured Confusion Matrix")
-        chosen_method = st.selectbox(
-            "Select Method to Inspect",
-            ["model_pred", "rules_pred", "prompt_pred"],
-            format_func=lambda k: methods_data.get(k, {}).get("meta", {}).get("name", k)
-        )
-        if chosen_method in methods_data:
-            cm = methods_data[chosen_method]["confusion_matrix"]["matrix"]
-            fig = px.imshow(cm, x=LABELS, y=LABELS, text_auto=True, aspect="auto", color_continuous_scale=["#102820","#c5a45d"])
-            fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font_color="#e9dfc8", xaxis_title="Predicted label", yaxis_title="Gold label")
-            st.plotly_chart(fig, use_container_width=True)
-            
-            # Per-class breakdown
-            st.markdown(f"#### Per-Class Breakdown â€” {methods_data[chosen_method]['meta']['name']}")
-            pc = methods_data[chosen_method]["per_class"]
-            pc_rows = [{"Class": lbl, "Precision": f"{pc[lbl]['precision']:.4f}", "Recall": f"{pc[lbl]['recall']:.4f}", "F1-Score": f"{pc[lbl]['f1']:.4f}", "Support": pc[lbl]["support"]} for lbl in LABELS if lbl in pc]
-            st.dataframe(pd.DataFrame(pc_rows), use_container_width=True, hide_index=True)
-        
-        # Download Unified Predictions
-        with open(unified_csv_file, "rb") as fp:
-            st.download_button(
-                "Download Unified Test Predictions (CSV)",
-                data=fp.read(),
-                file_name="unified_test_evaluation.csv",
-                mime="text/csv"
-            )
-    else:
-        metrics = make_demo_predictions()
-        st.warning("Demo mode is active. Real test outputs not found; showing illustrative fixtures.")
-        c1,c2,c3 = st.columns(3)
-        for col, method in zip([c1,c2,c3], ["rules_pred","model_pred","prompt_pred"]):
-            report = metrics[method]
-            with col:
-                st.markdown(f"<div class='panel'><div class='panel-title'>{method.replace('_',' ').upper()}</div><h3>Illustrative only</h3><p class='small-muted'>Replace with measured test-set output.</p><div class='gold-line'></div><p>Macro-F1 fixture: {report['macro_f1']:.2f}</p></div>", unsafe_allow_html=True)
-        st.markdown("### Example confusion matrix â€” fixture data")
-        method = st.selectbox("Method", ["rules_pred","model_pred","prompt_pred"])
-        cm = metrics[method]["confusion_matrix"]
-        fig = px.imshow(cm, x=LABELS, y=LABELS, text_auto=True, aspect="auto", color_continuous_scale=["#102820","#c5a45d"])
-        fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font_color="#e9dfc8", xaxis_title="Predicted label", yaxis_title="Gold label")
-        st.plotly_chart(fig, use_container_width=True)
-        
-    st.markdown("### Required final evaluation checklist")
-    for item in ["Freeze and document test split IDs.", "Use identical test sentence IDs for rules, model, and prompt baseline.", "Report per-class precision, recall, F1 and macro-F1.", "Include confusion matrices and representative errors.", "Measure latency on a named machine/environment.", "Do not tune thresholds on the test set."]:
-        st.checkbox(item, key="check_"+str(abs(hash(item))))
+    st.markdown("### Evaluation protocol")
+    for item in [
+        "Freeze and document test split IDs.",
+        "Use identical examples for direct method comparisons.",
+        "Report per-class precision, recall, F1 and macro-F1.",
+        "Include confusion matrices and representative errors.",
+        "Measure latency on a named machine/environment.",
+        "Do not tune thresholds on the test set.",
+    ]:
+        st.checkbox(item, key="check_" + str(abs(hash(item))))
+
 
 def render_errors():
     hero("Failure review / 05", "Inspect the misses.", "Error analysis is part of the deliverable, not an afterthought. Record the evidence, likely cause, and what should change without tuning against the final test set.")
@@ -806,44 +934,205 @@ def render_errors():
     st.caption("Rows above are illustrative templates, not observed errors. Replace them with actual error examples before submission.")
 
 def render_integration():
-    hero("Integration console / 06", "One contract. Three methods.", "The UI calls adapters rather than embedding detection logic in Streamlit. Each module owner remains responsible for fixing their module-level bugs.")
+    hero(
+        "Integration console / 06",
+        "One contract. Honest status.",
+        "Live component status is obtained from the integration pipeline. "
+        "Unavailable models and external services are shown explicitly."
+    )
+
     st.markdown("### Shared label contract")
     st.code("no_ambiguity | vague | attachment | scope | pronoun", language="text")
+
     st.markdown("### Canonical detection record")
-    st.code(json.dumps({"sentence_id":"S001","text":"The admin monitors the user with the sensor.","gold_label":"attachment","predictions":[{"source":"rules","label":"attachment","span":"with the sensor","confidence":None,"reason":"The phrase may attach in more than one way."}],"readings":["The admin uses a sensor to monitor the user.","The user has a sensor associated with them."],"rewrites":["The admin uses the sensor to monitor the user."]}, indent=2), language="json")
-    status = [
-        ("Person 2 â€” Rules", "src/rules/detect.py", "Active & verified; handcrafted 5-category ambiguity rules connected"),
-        ("Person 3 â€” DistilBERT", "src/model/predict.py", "Active & verified; fine-tuned DistilBERT checkpoint loaded & inferencing"),
-        ("Person 4 â€” Explanations", "src/explanations/explain.py", "Active & verified; linguistic templates & rewrite generator connected"),
-        ("Person 4 â€” Prompt baseline", "src/explanations/baseline.py", "Adapter ready; live execution requires GEMINI_API_KEY environment variable")
+    st.code(json.dumps({
+        "sentence_id": "S001",
+        "text": "The admin monitors the user with the sensor.",
+        "gold_label": "attachment",
+        "predictions": [{
+            "source": "rules",
+            "label": "attachment",
+            "span": "with the sensor",
+            "confidence": None,
+            "reason": "The phrase may attach in more than one way."
+        }],
+        "readings": [
+            "The admin uses a sensor to monitor the user.",
+            "The user has a sensor associated with them."
+        ],
+        "rewrites": [
+            "The admin uses the sensor to monitor the user."
+        ]
+    }, indent=2), language="json")
+
+    st.markdown("### Live component status")
+
+    try:
+        probe = analyze_text(
+            "The admin monitors the user with the sensor."
+        )
+        statuses = probe.get("component_status", {})
+        errors = probe.get("component_errors", {})
+        pipeline_mode = probe.get("mode", "unknown")
+    except Exception as exc:
+        statuses = {}
+        errors = {"pipeline": str(exc)}
+        pipeline_mode = "unavailable"
+
+    component_rows = [
+        ("Rule-based detector", "src/rules/detect.py", "rules"),
+        ("DistilBERT classifier", "src/model/predict.py", "model"),
+        ("Explanation and rewriting", "src/explanations/explain.py", "explanations"),
     ]
-    for owner, path, note in status:
-        st.markdown(f"<div class='panel'><b>{owner}</b><div class='small-muted'>{path}</div><p>{note}</p></div>", unsafe_allow_html=True)
-    st.info("Place teammates' modules at the paths above or update the adapter configuration in `src/integration/pipeline.py`. Missing modules should be visibleâ€”not silently presented as trained models.")
+
+    for title, module_path, component in component_rows:
+        component_status = statuses.get(component, "unavailable")
+        detail = errors.get(component, "")
+
+        if component_status == "available":
+            st.success(f"{title}: Available — live adapter returned successfully.")
+        elif component_status == "demo":
+            st.warning(f"{title}: Demo fallback — illustrative output only.")
+        else:
+            st.error(
+                f"{title}: Unavailable — "
+                f"{detail or 'No verified live component output.'}"
+            )
+
+        st.caption(module_path)
+
+    import os
+
+    gemini_configured = bool(
+        os.environ.get("GEMINI_API_KEY")
+        or os.environ.get("GOOGLE_API_KEY")
+    )
+
+    if gemini_configured:
+        st.info(
+            "Gemini zero-shot baseline: API key detected. "
+            "Live API execution has not been verified by this status check."
+        )
+    else:
+        st.warning(
+            "Gemini zero-shot baseline: Unavailable for live execution. "
+            "GEMINI_API_KEY / GOOGLE_API_KEY is not configured. "
+            "Previously cached valid predictions are used only in the "
+            "evidence-aware evaluation report."
+        )
+
+    st.caption(f"Overall pipeline mode: {pipeline_mode}")
+
+    st.info(
+        "A successful adapter check does not establish model training quality. "
+        "DistilBERT requires actual checkpoint weights before it can produce "
+        "verified predictions. Missing components are never represented as "
+        "trained or verified models."
+    )
+
 
 def render_viva():
-    hero("Presentation suite / 07", "Explain the engineering.", "A concise demo flow and viva notes for Team. The goal is to explain integration decisions, evaluation integrity, and limitations clearly.")
+    hero(
+        "Presentation suite / 07",
+        "Explain the engineering honestly.",
+        "A practical demo of the working integration, measured comparisons, "
+        "and current model availability."
+    )
+
     st.markdown("### Suggested 4-minute demo")
+
     demo = [
-        ("0:00Ã¢â‚¬â€œ0:30", "Introduce the problem", "Clarity Lint flags possible ambiguity in requirements, contracts, and policies."),
-        ("0:30Ã¢â‚¬â€œ1:15", "Analyze one sentence", "Use Ã¢â‚¬Å“The admin monitors the user with the sensor.Ã¢â‚¬Â Show the competing readings."),
-        ("1:15Ã¢â‚¬â€œ2:00", "Review a document", "Show sentence counts, type breakdown, and the project-defined ambiguity rate."),
-        ("2:00Ã¢â‚¬â€œ3:00", "Compare methods", "Explain rules vs DistilBERT vs prompt baseline on the same held-out test set."),
-        ("3:00Ã¢â‚¬â€œ4:00", "Discuss limitations", "Show one false positive and one false negative; explain why human review matters.")
+        ("0:00–0:30", "Introduce the problem",
+         "Clarity Lint identifies possible ambiguity in requirements, "
+         "contracts, and policies."),
+
+        ("0:30–1:15", "Analyze one sentence",
+         "Use 'The admin monitors the user with the sensor.' "
+         "Show the live rule detection, competing readings, and rewrites."),
+
+        ("1:15–2:00", "Review a document",
+         "Show sentence counts, ambiguity categories, and the document-level "
+         "summary produced by the integration pipeline."),
+
+        ("2:00–3:00", "Review evaluation evidence",
+         "Compare fresh rule predictions and valid cached Gemini predictions "
+         "on the same 74 examples. Explain why two invalid Gemini responses "
+         "were excluded. DistilBERT is not scored because checkpoint weights "
+         "are unavailable."),
+
+        ("3:00–4:00", "Discuss limitations",
+         "Explain the missing DistilBERT weights, unavailable live Gemini API, "
+         "evaluation provenance, and the need for human review.")
     ]
-    for t, title, desc in demo:
-        st.markdown(f"<div class='panel'><span class='pill'>{t}</span><h3 style='margin-top:8px'>{title}</h3><p>{desc}</p></div>", unsafe_allow_html=True)
-    st.markdown("### Viva answer: your contribution")
-    st.markdown("> I built the Streamlit integration layer for Clarity Lint. It connects rule-based detection, the DistilBERT classifier, and the explanation/rewrite module through a shared schema. I designed the dashboard to show sentence-level evidence and document summaries, and I prepared evaluation utilities to compare all methods on the same held-out test set using per-class precision, recall, F1, macro-F1, confusion matrices, and latency. I distinguish demo fixtures from measured results and present every flag as a suggestion for human review.")
+
+    for timing, title, description in demo:
+        st.markdown(
+            f"<div class='panel'><span class='pill'>{timing}</span>"
+            f"<h3 style='margin-top:8px'>{title}</h3>"
+            f"<p>{description}</p></div>",
+            unsafe_allow_html=True
+        )
+
+    st.markdown("### Viva answer: integration contribution")
+
+    st.markdown(
+        "> I developed the Streamlit integration layer for Clarity Lint. "
+        "It connects the rule-based detector and explanation/rewrite engine "
+        "through a shared integration pipeline. I added explicit component "
+        "availability reporting so unavailable model outputs are not presented "
+        "as genuine predictions. I also implemented evidence-aware evaluation "
+        "utilities and a comparative report. The current evaluation compares "
+        "fresh rule predictions with valid cached Gemini predictions on the "
+        "same 74 held-out examples. DistilBERT is not scored because its "
+        "checkpoint weights are missing from the current workspace. The "
+        "dashboard distinguishes measured results from illustrative fixtures "
+        "and presents ambiguity findings as suggestions for human review."
+    )
+
     st.markdown("### Questions to prepare")
+
     with st.expander("Why not put all NLP logic in app.py?"):
-        st.write("Separating UI, integration adapters, and model/rule logic makes each module independently testable and lets teammates own their code.")
+        st.write(
+            "Separating the UI, integration adapters, and model/rule logic "
+            "makes each module independently testable and lets teammates "
+            "maintain their own implementations."
+        )
+
     with st.expander("What is the ambiguity rate?"):
-        st.write("A project-defined descriptive statistic: flagged sentences divided by total sentences, multiplied by 100. It is not a validated legal-risk score.")
-    with st.expander("Why compare on the same test set?"):
-        st.write("Otherwise differences could come from different examples rather than method quality. Test data should stay untouched until choices are finalized.")
-    with st.expander("What if rules and model disagree?"):
-        st.write("Show the disagreement. It is a useful review signal and an opportunity for error analysis, not a reason to silently choose one output.")
+        st.write(
+            "A project-defined descriptive statistic: flagged sentences "
+            "divided by total sentences, multiplied by 100. It is not a "
+            "validated legal-risk score."
+        )
+
+    with st.expander("Why compare methods on identical examples?"):
+        st.write(
+            "Differences should reflect method behaviour rather than different "
+            "test examples. The current direct comparison uses the common "
+            "74 examples with valid Gemini responses."
+        )
+
+    with st.expander("Why is DistilBERT unavailable?"):
+        st.write(
+            "The current workspace contains the model configuration and "
+            "tokenizer files, but no trained model weight file. A genuine "
+            "DistilBERT evaluation must wait for the trained checkpoint."
+        )
+
+    with st.expander("Why are two Gemini responses excluded?"):
+        st.write(
+            "Two cached requests returned HTTP 429 errors. They are invalid "
+            "predictions and must not be counted as correct or incorrect "
+            "classifications."
+        )
+
+    with st.expander("What if rules and a model disagree?"):
+        st.write(
+            "Show the disagreement. It is a useful review signal and an "
+            "opportunity for error analysis, not a reason to silently choose "
+            "one output."
+        )
+
 
 if page == "Overview": render_overview()
 elif page == "Analyze Text": render_analysis()

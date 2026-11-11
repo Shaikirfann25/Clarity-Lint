@@ -1,0 +1,77 @@
+sentence_id,text,gold_label,rules_pred,gemini_pred,gemini_valid,distilbert_cached_pred,distilbert_provenance
+S353,The analyst cleaned the noise in the dataset and removed it before training.,pronoun,pronoun,pronoun,True,pronoun,unverified_cached_prediction
+S322,When the HR manager interviewed the candidate she was impressed by the portfolio.,pronoun,no_ambiguity,pronoun,True,pronoun,unverified_cached_prediction
+S303,After the manager reviewed the intern's work she sent written feedback.,pronoun,no_ambiguity,pronoun,True,pronoun,unverified_cached_prediction
+S324,When the senior analyst reviewed the junior analyst's work she found several errors.,pronoun,no_ambiguity,pronoun,True,pronoun,unverified_cached_prediction
+S390,The lead designer reviewed the associate's mockup and sent her a list of revisions.,pronoun,no_ambiguity,pronoun,True,pronoun,unverified_cached_prediction
+S398,The client reviewed the mockup and the designer updated it based on their comments.,pronoun,pronoun,pronoun,True,pronoun,unverified_cached_prediction
+S377,The developer merged the branch and this caused an unexpected build failure.,pronoun,no_ambiguity,pronoun,True,pronoun,unverified_cached_prediction
+S389,The mentor encouraged the mentee to present his work to the wider team.,pronoun,no_ambiguity,pronoun,True,pronoun,unverified_cached_prediction
+S385,The editor gave the author feedback on his opening chapter.,pronoun,no_ambiguity,pronoun,True,pronoun,unverified_cached_prediction
+S321,After the project manager briefed the client he asked for a status update.,pronoun,no_ambiguity,pronoun,True,pronoun,unverified_cached_prediction
+S363,The operator adjusted the parameter in the configuration file and reloaded it remotely.,pronoun,pronoun,pronoun,True,attachment,unverified_cached_prediction
+S374,The auditors discovered an irregularity and reported this to the oversight committee.,pronoun,no_ambiguity,pronoun,True,pronoun,unverified_cached_prediction
+S315,After Neha contacted Divya about the schedule she revised the project timeline.,pronoun,no_ambiguity,pronoun,True,pronoun,unverified_cached_prediction
+S395,The reviewer and the author discussed the findings and she requested additional citations.,pronoun,no_ambiguity,pronoun,True,pronoun,unverified_cached_prediction
+S352,The system detected an error in the log file and deleted it automatically.,pronoun,pronoun,pronoun,True,pronoun,unverified_cached_prediction
+S405,The researcher emailed the supervisor to say that she had completed the data collection.,pronoun,no_ambiguity,pronoun,True,pronoun,unverified_cached_prediction
+S054,Management expects consistent improvement from the team.,vague,no_ambiguity,vague,True,vague,unverified_cached_prediction
+S023,The model must be lightweight enough for edge devices.,vague,no_ambiguity,vague,True,vague,unverified_cached_prediction
+S003,The API should return results fast.,vague,vague,vague,True,vague,unverified_cached_prediction
+S025,The CI build should succeed quickly for small changes.,vague,vague,vague,True,vague,unverified_cached_prediction
+S089,The site loads kind of slowly on mobile devices.,vague,no_ambiguity,vague,True,no_ambiguity,unverified_cached_prediction
+S091,The product should work well with other software.,vague,no_ambiguity,vague,True,vague,unverified_cached_prediction
+S076,The hospital must maintain adequate staffing levels.,vague,vague,vague,True,vague,unverified_cached_prediction
+S088,The user should find the app easy to navigate.,vague,no_ambiguity,vague,True,vague,unverified_cached_prediction
+S084,The contractor must meet reasonable performance benchmarks.,vague,vague,vague,True,vague,unverified_cached_prediction
+S021,The API documentation must be thorough.,vague,no_ambiguity,vague,True,vague,unverified_cached_prediction
+S062,The analysis produced fairly consistent results.,vague,no_ambiguity,vague,True,vague,unverified_cached_prediction
+S073,The facility must maintain appropriate sanitation levels.,vague,vague,vague,True,vague,unverified_cached_prediction
+S015,The dashboard should load fast on all devices.,vague,vague,vague,True,vague,unverified_cached_prediction
+S095,The package should arrive within a few business days.,vague,no_ambiguity,vague,True,vague,unverified_cached_prediction
+S053,The estimate for the task should be realistic.,vague,no_ambiguity,vague,True,vague,unverified_cached_prediction
+S153,He noticed the technician servicing the equipment in the storage area.,attachment,no_ambiguity,attachment,True,attachment,unverified_cached_prediction
+S122,The analyst submitted the data with the correction notes.,attachment,no_ambiguity,attachment,True,attachment,unverified_cached_prediction
+S103,The detective found the suspect with the knife.,attachment,attachment,attachment,True,attachment,unverified_cached_prediction
+S124,She reviewed the clause with the penalty conditions.,attachment,attachment,attachment,True,attachment,unverified_cached_prediction
+S188,The director approved the plan for the renovation with the reduced budget.,attachment,no_ambiguity,attachment,True,pronoun,unverified_cached_prediction
+S192,She interviewed the senior managers and analysts about the project.,attachment,no_ambiguity,attachment,True,attachment,unverified_cached_prediction
+S175,They only submitted the first module for review.,attachment,scope,scope,True,scope,unverified_cached_prediction
+S187,He attached the file to the email with the sensitive data.,attachment,no_ambiguity,attachment,True,attachment,unverified_cached_prediction
+S183,He noticed the error in the script written by the contractor.,attachment,no_ambiguity,attachment,True,attachment,unverified_cached_prediction
+S121,She accepted the offer with the extended deadline.,attachment,no_ambiguity,attachment,True,attachment,unverified_cached_prediction
+S161,She submitted the draft to the editor that required significant revisions.,attachment,vague,attachment,True,attachment,unverified_cached_prediction
+S172,She nearly missed every scheduled review.,attachment,no_ambiguity,scope,True,attachment,unverified_cached_prediction
+S115,She delivered the presentation with the new sales strategy.,attachment,no_ambiguity,attachment,True,attachment,unverified_cached_prediction
+S193,He distributed the updated report to the engineers and testers in the room.,attachment,no_ambiguity,attachment,True,attachment,unverified_cached_prediction
+S152,She photographed the tourists visiting the old city walls.,attachment,no_ambiguity,attachment,True,attachment,unverified_cached_prediction
+S254,A few modules were not fully tested in the regression cycle.,scope,no_ambiguity,vague,True,scope,unverified_cached_prediction
+S222,All participants must register online or in person before the deadline.,scope,no_ambiguity,scope,True,scope,unverified_cached_prediction
+S203,Not every feature must be completed before the deadline.,scope,no_ambiguity,scope,True,scope,unverified_cached_prediction
+S224,All employees must submit a report or attend the debrief session.,scope,no_ambiguity,scope,True,scope,unverified_cached_prediction
+S290,The alert is sent to the on-call engineer or to the backup contact.,scope,no_ambiguity,no_ambiguity,True,no_ambiguity,unverified_cached_prediction
+S292,All test cases did not pass on the initial automated run.,scope,scope,scope,True,scope,unverified_cached_prediction
+S277,Each component passed the functional test and the performance benchmark.,scope,no_ambiguity,no_ambiguity,True,scope,unverified_cached_prediction
+S289,Managers should report the incident to the HR team or to the legal department.,scope,no_ambiguity,no_ambiguity,True,vague,unverified_cached_prediction
+S285,Staff can request remote work on Mondays or on Fridays each week.,scope,no_ambiguity,scope,True,scope,unverified_cached_prediction
+S221,Every student must complete the exam or the practical assignment.,scope,no_ambiguity,scope,True,scope,unverified_cached_prediction
+S262,Employees should not share credentials or access rights with colleagues.,scope,no_ambiguity,scope,True,scope,unverified_cached_prediction
+S273,All students completed the quiz and the group assignment.,scope,no_ambiguity,scope,True,scope,unverified_cached_prediction
+S215,The policy does not apply to managers or senior directors.,scope,no_ambiguity,scope,True,scope,unverified_cached_prediction
+S295,Not all patches submitted in the last sprint were successfully reviewed.,scope,no_ambiguity,scope,True,scope,unverified_cached_prediction
+S253,Some features were excluded from the current release.,scope,no_ambiguity,vague,True,scope,unverified_cached_prediction
+S460,Select Export as PDF from the File menu to save a copy of the report.,no_ambiguity,no_ambiguity,,False,no_ambiguity,unverified_cached_prediction
+S429,The red button on the left panel opens the emergency exit door.,no_ambiguity,no_ambiguity,,False,no_ambiguity,unverified_cached_prediction
+S410,The database backup must run every night at 2:00 AM UTC.,no_ambiguity,no_ambiguity,no_ambiguity,True,no_ambiguity,unverified_cached_prediction
+S431,The project was completed three weeks ahead of the original delivery date.,no_ambiguity,no_ambiguity,no_ambiguity,True,no_ambiguity,unverified_cached_prediction
+S495,The maximum file name length on NTFS is 255 Unicode characters.,no_ambiguity,no_ambiguity,no_ambiguity,True,no_ambiguity,unverified_cached_prediction
+S499,"The test pipeline must pass on Python 3.9, 3.10, and 3.11 before any release is tagged.",no_ambiguity,no_ambiguity,no_ambiguity,True,no_ambiguity,unverified_cached_prediction
+S482,The configuration key max_retries controls the number of reconnection attempts after failure.,no_ambiguity,no_ambiguity,no_ambiguity,True,no_ambiguity,unverified_cached_prediction
+S494,The square root of 144 is 12.,no_ambiguity,no_ambiguity,no_ambiguity,True,no_ambiguity,unverified_cached_prediction
+S490,The timestamp in column D is in UTC and must be converted to IST before reporting.,no_ambiguity,no_ambiguity,no_ambiguity,True,no_ambiguity,unverified_cached_prediction
+S428,Maria submitted the final report on Friday at 5:00 PM.,no_ambiguity,no_ambiguity,no_ambiguity,True,attachment,unverified_cached_prediction
+S468,The blue folder on the top shelf of the left cabinet contains the signed contracts.,no_ambiguity,no_ambiguity,no_ambiguity,True,no_ambiguity,unverified_cached_prediction
+S479,The test on line 89 verifies that the login endpoint returns a 401 for invalid credentials.,no_ambiguity,no_ambiguity,no_ambiguity,True,no_ambiguity,unverified_cached_prediction
+S422,The system must send an email confirmation within 60 seconds of registration.,no_ambiguity,no_ambiguity,no_ambiguity,True,no_ambiguity,unverified_cached_prediction
+S500,The bar chart shows revenue increased by exactly 15 percent from Q1 to Q2 of 2024.,no_ambiguity,no_ambiguity,no_ambiguity,True,no_ambiguity,unverified_cached_prediction
+S459,Close all running applications before launching the system updater.,no_ambiguity,no_ambiguity,no_ambiguity,True,no_ambiguity,unverified_cached_prediction

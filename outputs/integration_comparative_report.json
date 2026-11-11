@@ -1,0 +1,382 @@
+{
+  "report_type": "evidence_aware_comparative_evaluation",
+  "dataset": {
+    "path": "data\\splits\\test.csv",
+    "total_examples": 76,
+    "labels": [
+      "no_ambiguity",
+      "vague",
+      "attachment",
+      "scope",
+      "pronoun"
+    ],
+    "comparison_examples": 74,
+    "comparison_sentence_ids": [
+      "S353",
+      "S322",
+      "S303",
+      "S324",
+      "S390",
+      "S398",
+      "S377",
+      "S389",
+      "S385",
+      "S321",
+      "S363",
+      "S374",
+      "S315",
+      "S395",
+      "S352",
+      "S405",
+      "S054",
+      "S023",
+      "S003",
+      "S025",
+      "S089",
+      "S091",
+      "S076",
+      "S088",
+      "S084",
+      "S021",
+      "S062",
+      "S073",
+      "S015",
+      "S095",
+      "S053",
+      "S153",
+      "S122",
+      "S103",
+      "S124",
+      "S188",
+      "S192",
+      "S175",
+      "S187",
+      "S183",
+      "S121",
+      "S161",
+      "S172",
+      "S115",
+      "S193",
+      "S152",
+      "S254",
+      "S222",
+      "S203",
+      "S224",
+      "S290",
+      "S292",
+      "S277",
+      "S289",
+      "S285",
+      "S221",
+      "S262",
+      "S273",
+      "S215",
+      "S295",
+      "S253",
+      "S410",
+      "S431",
+      "S495",
+      "S499",
+      "S482",
+      "S494",
+      "S490",
+      "S428",
+      "S468",
+      "S479",
+      "S422",
+      "S500",
+      "S459"
+    ],
+    "same_examples_for_rules_and_gemini": true
+  },
+  "provenance": {
+    "rules": "fresh_predictions_from_team_rule_detector",
+    "gemini": "cached_team_predictions_validity_checked",
+    "distilbert": "unavailable_current_checkpoint_weights_missing",
+    "gemini_invalid_rows_excluded": 2,
+    "distilbert_cache_alignment": "ids_text_and_gold_labels_aligned"
+  },
+  "methods": {
+    "rules_all_76": {
+      "status": "genuine_fresh_predictions",
+      "runtime_ms": 5.237,
+      "per_sample_ms": 0.0689,
+      "n_examples": 76,
+      "accuracy": 0.3684,
+      "macro_precision": 0.7206,
+      "macro_recall": 0.37,
+      "macro_f1": 0.3386,
+      "weighted_f1": 0.3394,
+      "per_class": {
+        "no_ambiguity": {
+          "precision": 0.2459,
+          "recall": 1.0,
+          "f1": 0.3947,
+          "support": 15
+        },
+        "vague": {
+          "precision": 0.8571,
+          "recall": 0.4,
+          "f1": 0.5455,
+          "support": 15
+        },
+        "attachment": {
+          "precision": 1.0,
+          "recall": 0.1333,
+          "f1": 0.2353,
+          "support": 15
+        },
+        "scope": {
+          "precision": 0.5,
+          "recall": 0.0667,
+          "f1": 0.1176,
+          "support": 15
+        },
+        "pronoun": {
+          "precision": 1.0,
+          "recall": 0.25,
+          "f1": 0.4,
+          "support": 16
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "no_ambiguity",
+          "vague",
+          "attachment",
+          "scope",
+          "pronoun"
+        ],
+        "matrix": [
+          [
+            15,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            9,
+            6,
+            0,
+            0,
+            0
+          ],
+          [
+            11,
+            1,
+            2,
+            1,
+            0
+          ],
+          [
+            14,
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            12,
+            0,
+            0,
+            0,
+            4
+          ]
+        ]
+      }
+    },
+    "rules_common_74": {
+      "status": "genuine_fresh_predictions_same_subset_as_gemini",
+      "runtime_ms": null,
+      "per_sample_ms": null,
+      "n_examples": 74,
+      "accuracy": 0.3514,
+      "macro_precision": 0.7155,
+      "macro_recall": 0.37,
+      "macro_f1": 0.3319,
+      "weighted_f1": 0.332,
+      "per_class": {
+        "no_ambiguity": {
+          "precision": 0.2203,
+          "recall": 1.0,
+          "f1": 0.3611,
+          "support": 13
+        },
+        "vague": {
+          "precision": 0.8571,
+          "recall": 0.4,
+          "f1": 0.5455,
+          "support": 15
+        },
+        "attachment": {
+          "precision": 1.0,
+          "recall": 0.1333,
+          "f1": 0.2353,
+          "support": 15
+        },
+        "scope": {
+          "precision": 0.5,
+          "recall": 0.0667,
+          "f1": 0.1176,
+          "support": 15
+        },
+        "pronoun": {
+          "precision": 1.0,
+          "recall": 0.25,
+          "f1": 0.4,
+          "support": 16
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "no_ambiguity",
+          "vague",
+          "attachment",
+          "scope",
+          "pronoun"
+        ],
+        "matrix": [
+          [
+            13,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            9,
+            6,
+            0,
+            0,
+            0
+          ],
+          [
+            11,
+            1,
+            2,
+            1,
+            0
+          ],
+          [
+            14,
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            12,
+            0,
+            0,
+            0,
+            4
+          ]
+        ]
+      }
+    },
+    "gemini_valid_common": {
+      "status": "cached_valid_predictions_not_live_latency",
+      "runtime_ms": null,
+      "per_sample_ms": null,
+      "n_examples": 74,
+      "accuracy": 0.9054,
+      "macro_precision": 0.9056,
+      "macro_recall": 0.9067,
+      "macro_f1": 0.9007,
+      "weighted_f1": 0.9021,
+      "per_class": {
+        "no_ambiguity": {
+          "precision": 0.8125,
+          "recall": 1.0,
+          "f1": 0.8966,
+          "support": 13
+        },
+        "vague": {
+          "precision": 0.8824,
+          "recall": 1.0,
+          "f1": 0.9375,
+          "support": 15
+        },
+        "attachment": {
+          "precision": 1.0,
+          "recall": 0.8667,
+          "f1": 0.9286,
+          "support": 15
+        },
+        "scope": {
+          "precision": 0.8333,
+          "recall": 0.6667,
+          "f1": 0.7407,
+          "support": 15
+        },
+        "pronoun": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 16
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "no_ambiguity",
+          "vague",
+          "attachment",
+          "scope",
+          "pronoun"
+        ],
+        "matrix": [
+          [
+            13,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            15,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            13,
+            2,
+            0
+          ],
+          [
+            3,
+            2,
+            0,
+            10,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            16
+          ]
+        ]
+      }
+    },
+    "distilbert": {
+      "status": "unavailable_current_checkpoint_weights_missing",
+      "metrics": null,
+      "runtime_ms": null,
+      "per_sample_ms": null,
+      "note": "Cached predictions are retained in the CSV for traceability but are not scored as verified inference."
+    }
+  },
+  "limitations": [
+    "Gemini metrics use only valid cached responses.",
+    "Gemini inference latency cannot be recovered from cached predictions.",
+    "DistilBERT checkpoint weights are missing from the current workspace.",
+    "Cached DistilBERT predictions are not independently verified.",
+    "Rule-based multi-finding outputs are reduced using the team's primary_label priority through predict_label."
+  ]
+}

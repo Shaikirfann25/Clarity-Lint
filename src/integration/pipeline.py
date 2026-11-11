@@ -1,145 +1,372 @@
-"""Integration adapters for Clarity Lint.
+﻿"""Transparent integration adapters for Clarity Lint.
 
-The demo fallback is intentionally transparent and is not a replacement for teammates'
-rule/model/explanation modules. Optional imports are attempted only when those modules exist.
+Real component outputs are kept separate from illustrative demo output.
+Unavailable components are reported explicitly; no silent fallback is used.
 """
+
 from __future__ import annotations
-import re, time
+
+import os
+import re
+import time
 from typing import Any
 
+
 LABELS = {"no_ambiguity", "vague", "attachment", "scope", "pronoun"}
-VAGUE_TERMS = ["soon", "appropriate", "regularly", "as needed", "reasonable", "promptly", "adequate", "timely"]
+DEMO_ENABLED = os.getenv("CLARITY_LINT_DEMO_MODE", "").strip().lower() in {
+    "1", "true", "yes", "on"
+}
+
+VAGUE_TERMS = [
+    "soon", "appropriate", "regularly", "as needed",
+    "reasonable", "promptly", "adequate", "timely"
+]
+
 
 def demo_mode_label() -> str:
-    return "DEMO / illustrative fallback"
+    return "DEMO / illustrative fallback (explicitly enabled only)"
+
 
 def _demo_detect(sentence: str) -> list[dict[str, Any]]:
-    text = sentence
-    low = text.lower()
     found = []
+
     for term in VAGUE_TERMS:
-        match = re.search(r"\b" + re.escape(term) + r"\b", text, flags=re.I)
+        match = re.search(r"\b" + re.escape(term) + r"\b", sentence, re.I)
         if match:
-            found.append({"source":"demo_rules","label":"vague","span":match.group(0),
-                          "confidence":None,"reason":f"'{match.group(0)}' may lack a measurable threshold or timeframe."})
+            found.append({
+                "source": "demo_rules",
+                "label": "vague",
+                "span": match.group(0),
+                "confidence": None,
+                "reason": "Illustrative heuristic: this term may lack a measurable threshold."
+            })
             break
-    if re.search(r"\bwith\s+(?:the|a|an)\s+\w+", text, re.I):
-        m = re.search(r"\bwith\s+(?:the|a|an)\s+\w+", text, re.I)
-        found.append({"source":"demo_rules","label":"attachment","span":m.group(0),
-                      "confidence":None,"reason":"This prepositional phrase may attach to different parts of the sentence; context is needed."})
-    if re.search(r"\b(it|they|them|their|he|she|this|that)\b", text, re.I):
-        m = re.search(r"\b(it|they|them|their|he|she|this|that)\b", text, re.I)
-        found.append({"source":"demo_rules","label":"pronoun","span":m.group(0),
-                      "confidence":None,"reason":"The reference may be unclear if more than one antecedent is plausible."})
-    if re.search(r"\bnot\b.*\band\b|\ball\b.*\band\b", low):
-        m = re.search(r"\bnot\b.*\band\b|\ball\b.*\band\b", text, re.I)
-        found.append({"source":"demo_rules","label":"scope","span":m.group(0),
-                      "confidence":None,"reason":"The scope of a modifier or coordination may need to be made explicit."})
-    # Keep demo output conservative-ish: only the first heuristic hit is used for this demo.
-    # Real team detector can emit multiple findings with better context checks.
-    return found[:2]
 
-def _demo_explain(sentence: str, detections: list[dict[str, Any]]) -> tuple[str, list[str], list[str]]:
+    return found
+
+
+def _demo_explain(sentence: str, detections: list[dict[str, Any]]):
     if not detections:
-        return ("No configured demo pattern flagged this sentence. That does not prove it is unambiguous.", [], [])
-    label = detections[0]["label"]
-    if label == "vague":
-        return ("The flagged term may leave timing, quality, or required conditions open to interpretation.",
-                ["Different readers may apply different thresholds or deadlines."],
-                ["Replace the vague term with a measurable threshold or an agreed deadline (only after the intended value is confirmed)."])
-    if label == "attachment":
-        return ("The phrase may modify more than one part of the sentence, changing who uses what or how an action is performed.",
-                ["The actor uses the object as a tool.", "The object is associated with another entity in the sentence."],
-                ["If the actor uses the object: state that relationship directly.", "If the object belongs to the other entity: name that relationship directly."])
-    if label == "pronoun":
-        return ("A pronoun may refer to more than one entity. Naming the intended entity avoids guessing.",
-                ["The pronoun refers to the first mentioned entity.", "The pronoun refers to another mentioned entity."],
-                ["Replace the pronoun with the intended person's or system's name."])
-    return ("A modifier or coordinated phrase may apply to more than one part of the sentence.",
-            ["The modifier applies to the whole coordinated group.", "The modifier applies to only one part of the group."],
-            ["Rewrite the sentence so the intended scope is explicit."])
+        return (
+            "No illustrative demo pattern flagged this sentence. "
+            "This does not prove that it is unambiguous.",
+            [],
+            []
+        )
 
-def _call_team_rules(sentence: str):
+    return (
+        "Illustrative explanation only. Review the flagged phrase in context.",
+        ["The phrase may have more than one interpretation."],
+        ["Rewrite the sentence to state the intended meaning explicitly."]
+    )
+
+
+def _normalise_findings(rule_records: Any) -> list[dict[str, Any]]:
+    """Adapt the team's nested predictions schema to dashboard findings."""
+    if not isinstance(rule_records, list):
+        raise ValueError("Rule detector did not return a list.")
+
+    findings = []
+
+    for record in rule_records:
+        if not isinstance(record, dict):
+            continue
+
+        nested = record.get("predictions")
+
+        if isinstance(nested, list):
+            candidates = nested
+        elif record.get("label") in LABELS and record.get("label") != "no_ambiguity":
+            candidates = [record]
+        else:
+            candidates = []
+
+        for item in candidates:
+            if not isinstance(item, dict):
+                continue
+
+            label = item.get("label")
+            if label not in LABELS or label == "no_ambiguity":
+                continue
+
+            findings.append({
+                "source": item.get("source", "rules"),
+                "label": label,
+                "span": item.get("span"),
+                "confidence": item.get("confidence"),
+                "reason": item.get("reason") or "Possible ambiguity detected; review in context."
+            })
+
+    return findings
+
+
+def _call_team_rules(sentence: str) -> dict[str, Any]:
     try:
         from src.rules.detect import detect
-        result = detect([sentence])
-        if isinstance(result, list):
-            return result
-    except (ImportError, AttributeError, TypeError):
-        pass
-    return None
 
-def _call_team_model(sentence: str):
+        result = detect([sentence])
+        findings = _normalise_findings(result)
+
+        return {
+            "status": "available",
+            "source": "team_rules",
+            "predictions": findings,
+            "error": None
+        }
+    except Exception as exc:
+        return {
+            "status": "error",
+            "source": "team_rules",
+            "predictions": [],
+            "error": f"{type(exc).__name__}: {exc}"
+        }
+
+
+def _call_team_model(sentence: str) -> dict[str, Any]:
     try:
         from src.model.predict import predict
-        result = predict([sentence])
-        if isinstance(result, list):
-            return result
-    except (ImportError, AttributeError, TypeError):
-        pass
-    return None
 
-def _call_team_explanations(sentence: str, detections):
+        result = predict([sentence])
+
+        if not isinstance(result, list) or len(result) != 1:
+            return {
+                "status": "invalid_output",
+                "prediction": None,
+                "error": "Model adapter did not return exactly one prediction."
+            }
+
+        prediction = result[0]
+
+        if not isinstance(prediction, dict):
+            return {
+                "status": "invalid_output",
+                "prediction": None,
+                "error": "Model prediction is not a dictionary."
+            }
+
+        label = prediction.get("label")
+        confidence = prediction.get("confidence")
+
+        if label not in LABELS or not isinstance(confidence, (int, float)):
+            return {
+                "status": "unavailable",
+                "prediction": None,
+                "error": prediction.get("reason") or
+                         "Model returned a placeholder or invalid prediction."
+            }
+
+        if not 0.0 <= float(confidence) <= 1.0:
+            return {
+                "status": "invalid_output",
+                "prediction": None,
+                "error": "Model confidence is outside the range 0 to 1."
+            }
+
+        return {
+            "status": "available",
+            "prediction": {
+                "source": "model",
+                "label": label,
+                "span": prediction.get("span"),
+                "confidence": float(confidence),
+                "reason": prediction.get("reason", "")
+            },
+            "error": None
+        }
+
+    except Exception as exc:
+        return {
+            "status": "error",
+            "prediction": None,
+            "error": f"{type(exc).__name__}: {exc}"
+        }
+
+
+def _call_team_explanations(
+    sentence: str,
+    detections: list[dict[str, Any]]
+) -> dict[str, Any]:
     try:
         from src.explanations.explain import explain
+
         result = explain(sentence, detections)
-        if isinstance(result, dict):
-            return result
-    except (ImportError, AttributeError, TypeError):
-        pass
-    return None
+
+        if not isinstance(result, dict):
+            raise ValueError("Explanation engine did not return a dictionary.")
+
+        explanation = result.get("explanation")
+        readings = result.get("readings", [])
+        rewrites = result.get("rewrites", [])
+
+        if not isinstance(explanation, str):
+            raise ValueError("Explanation field must be a string.")
+
+        if not isinstance(readings, list) or not all(
+            isinstance(item, str) for item in readings
+        ):
+            raise ValueError("Readings must be a list of strings.")
+
+        if not isinstance(rewrites, list) or not all(
+            isinstance(item, str) for item in rewrites
+        ):
+            raise ValueError("Rewrites must be a list of strings.")
+
+        return {
+            "status": "available",
+            "explanation": explanation,
+            "readings": readings,
+            "rewrites": rewrites,
+            "error": None
+        }
+
+    except Exception as exc:
+        return {
+            "status": "error",
+            "explanation": "Explanation engine unavailable. Review the detector evidence directly.",
+            "readings": [],
+            "rewrites": [],
+            "error": f"{type(exc).__name__}: {exc}"
+        }
+
 
 def analyze_text(sentence: str) -> dict[str, Any]:
+    if not isinstance(sentence, str):
+        raise TypeError("sentence must be a string.")
+
+    if not sentence.strip():
+        raise ValueError("sentence must not be empty.")
+
     start = time.perf_counter()
-    rule_output = _call_team_rules(sentence)
-    if rule_output is None:
+
+    rule_result = _call_team_rules(sentence)
+    detections = rule_result["predictions"]
+
+    if rule_result["status"] != "available" and DEMO_ENABLED:
         detections = _demo_detect(sentence)
-        mode = "demo_fallback"
+        for finding in detections:
+            finding["source"] = "demo_rules"
+
+        rule_status = "demo"
     else:
-        detections = rule_output
-        mode = "team_rules_connected"
-    # Keep schema normalization at the integration boundary.
-    normalized = []
-    for d in detections or []:
-        label = d.get("label", "no_ambiguity")
-        if label not in LABELS: label = "no_ambiguity"
-        normalized.append({
-            "source": d.get("source", "rules" if mode == "team_rules_connected" else "demo_rules"),
-            "label": label, "span": d.get("span"), "confidence": d.get("confidence"),
-            "reason": d.get("reason", "Possible ambiguity; review in context.")
-        })
-    explanation_output = _call_team_explanations(sentence, normalized)
-    if explanation_output:
-        explanation = explanation_output.get("explanation", "Review the flagged evidence.")
-        readings = explanation_output.get("readings", [])
-        rewrites = explanation_output.get("rewrites", [])
+        rule_status = rule_result["status"]
+
+    explanation_result = _call_team_explanations(sentence, detections)
+
+    if explanation_result["status"] != "available" and DEMO_ENABLED:
+        explanation, readings, rewrites = _demo_explain(sentence, detections)
+        explanation_status = "demo"
     else:
-        explanation, readings, rewrites = _demo_explain(sentence, normalized)
-    # If classifier exists, expose its output separately; never merge its label into the rules list.
-    model_output = _call_team_model(sentence)
-    return {
-        "sentence_id": None, "text": sentence, "detections": normalized,
-        "model_predictions": model_output if model_output is not None else [],
-        "explanation": explanation, "readings": readings, "rewrites": rewrites,
-        "mode": mode, "latency_ms": (time.perf_counter()-start)*1000
+        explanation = explanation_result["explanation"]
+        readings = explanation_result["readings"]
+        rewrites = explanation_result["rewrites"]
+        explanation_status = explanation_result["status"]
+
+    model_result = _call_team_model(sentence)
+
+    model_predictions = (
+        [model_result["prediction"]]
+        if model_result["status"] == "available"
+        else []
+    )
+
+    statuses = {
+        "rules": rule_status,
+        "model": model_result["status"],
+        "explanations": explanation_status
     }
 
+    if all(value in {"available"} for value in statuses.values()):
+        mode = "fully_connected"
+    elif any(value == "available" for value in statuses.values()):
+        mode = "partially_connected"
+    elif any(value == "demo" for value in statuses.values()):
+        mode = "demo"
+    else:
+        mode = "unavailable"
+
+    return {
+        "sentence_id": None,
+        "text": sentence,
+        "detections": detections,
+        "model_predictions": model_predictions,
+        "explanation": explanation,
+        "readings": readings,
+        "rewrites": rewrites,
+        "mode": mode,
+        "component_status": statuses,
+        "component_errors": {
+            "rules": rule_result.get("error"),
+            "model": model_result.get("error"),
+            "explanations": explanation_result.get("error")
+        },
+        "latency_ms": (time.perf_counter() - start) * 1000
+    }
+
+
 def split_sentences(text: str) -> list[str]:
-    # Lightweight sentence splitter for demo; intentionally preserves sentence text/punctuation.
+    if not isinstance(text, str):
+        raise TypeError("text must be a string.")
+
     pieces = re.split(r"(?<=[.!?])\s+(?=[A-Z0-9\"'])", text.strip())
-    return [p.strip() for p in pieces if p.strip()]
+    return [piece.strip() for piece in pieces if piece.strip()]
+
 
 def analyze_document(text: str) -> dict[str, Any]:
     start = time.perf_counter()
+
     sentences = split_sentences(text)
-    results = [analyze_text(s) for s in sentences]
-    counts = {label: 0 for label in ["vague","attachment","scope","pronoun"]}
+    results = [analyze_text(sentence) for sentence in sentences]
+
+    counts = {
+        "vague": 0,
+        "attachment": 0,
+        "scope": 0,
+        "pronoun": 0
+    }
+
     for item in results:
-        seen = {d["label"] for d in item["detections"]}
+        seen = {finding["label"] for finding in item["detections"]}
         for label in counts:
-            if label in seen: counts[label] += 1
-    flagged = sum(bool(x["detections"]) for x in results)
+            if label in seen:
+                counts[label] += 1
+
+    flagged = sum(bool(item["detections"]) for item in results)
     total = len(results)
-    return {"sentences": results, "sentence_count": total, "flagged_count": flagged,
-            "ambiguity_rate": (flagged/total*100 if total else 0.0), "type_counts": counts,
-            "latency_ms": (time.perf_counter()-start)*1000, "mode": "demo_or_connected"}
+
+    component_status = {}
+
+    for component in ("rules", "model", "explanations"):
+        values = {item["component_status"][component] for item in results}
+
+        if not values:
+            component_status[component] = "not_run"
+        elif values == {"available"}:
+            component_status[component] = "available"
+        elif values == {"demo"}:
+            component_status[component] = "demo"
+        elif len(values) == 1:
+            component_status[component] = next(iter(values))
+        elif values.issubset({"available", "demo"}):
+            component_status[component] = "partially_demo"
+        else:
+            component_status[component] = "mixed"
+
+    modes = {item["mode"] for item in results}
+
+    if not modes:
+        mode = "not_run"
+    elif len(modes) == 1:
+        mode = next(iter(modes))
+    else:
+        mode = "mixed"
+
+    return {
+        "sentences": results,
+        "sentence_count": total,
+        "flagged_count": flagged,
+        "ambiguity_rate": (flagged / total * 100) if total else 0.0,
+        "type_counts": counts,
+        "component_status": component_status,
+        "latency_ms": (time.perf_counter() - start) * 1000,
+        "mode": mode
+    }

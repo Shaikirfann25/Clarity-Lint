@@ -16,7 +16,7 @@ from src.integration.evaluation import evaluate_predictions
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("csv", help="CSV with gold_label and one or more prediction columns")
-    parser.add_argument("--output", default="outputs/evaluation_report.json")
+    parser.add_argument("--output", default="outputs/cli_evaluation_report.json")
     args = parser.parse_args()
     df = pd.read_csv(args.csv)
     preds = [c for c in ["rules_pred", "model_pred", "prompt_pred"] if c in df.columns]
