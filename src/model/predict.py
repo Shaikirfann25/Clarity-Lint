@@ -34,19 +34,32 @@ LABEL_REASONS = {
 }
 
 # Default checkpoint path relative to project root
-DEFAULT_MODEL_DIR = Path(__file__).resolve().parent.parent.parent / "models" / "distilbert_clarity_lint"
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+DEFAULT_MODEL_DIR = Path(
+    os.environ.get(
+        "CLARITY_LINT_MODEL_DIR",
+        str(PROJECT_ROOT / "models" / "distilbert_clarity_lint")
+    )
+)
 
 # Lazy-loaded cache
 _CACHED_TOKENIZER = None
 _CACHED_MODEL = None
+_CACHED_MODEL_DIR = None
 
 
 def _load_model(model_dir: Path | str | None = None):
-    global _CACHED_TOKENIZER, _CACHED_MODEL
-    if _CACHED_MODEL is not None and _CACHED_TOKENIZER is not None:
-        return _CACHED_TOKENIZER, _CACHED_MODEL
+    global _CACHED_TOKENIZER, _CACHED_MODEL, _CACHED_MODEL_DIR
 
     path = Path(model_dir) if model_dir else DEFAULT_MODEL_DIR
+    path = path.resolve()
+
+    if (
+        _CACHED_MODEL is not None
+        and _CACHED_TOKENIZER is not None
+        and _CACHED_MODEL_DIR == path
+    ):
+        return _CACHED_TOKENIZER, _CACHED_MODEL
     if not (path.exists() and (path / "config.json").exists()):
         return None, None
 
@@ -62,6 +75,7 @@ def _load_model(model_dir: Path | str | None = None):
 
         _CACHED_TOKENIZER = tokenizer
         _CACHED_MODEL = model
+        _CACHED_MODEL_DIR = path
         return tokenizer, model
     except Exception as e:
         print(f"[DistilBERT] Warning: Failed to load checkpoint from {path}: {e}")
@@ -97,7 +111,7 @@ def predict(sentences: Union[List[str], str], model_dir: Path | str | None = Non
                 "label": "no_ambiguity",
                 "span": None,
                 "confidence": None,
-                "reason": "Model checkpoint not yet loaded; train_classifier.py awaiting dataset from Person 1."
+                "reason": "Fine-tuned DistilBERT checkpoint could not be loaded. Check CLARITY_LINT_MODEL_DIR and model files."
             }
             for _ in sentences
         ]
@@ -149,4 +163,3 @@ if __name__ == "__main__":
     for s, r in zip(test_sentences, res):
         print(f"  Sentence: {s}")
         print(f"  Prediction: {r}\n")
-

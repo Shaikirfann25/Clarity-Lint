@@ -1,10 +1,10 @@
-# Virtual Environment
+# Virtual environments
 .venv/
 venv/
 ENV/
 env/
 
-# Python cache & bytecode
+# Python cache and test artifacts
 __pycache__/
 *.py[cod]
 *$py.class
@@ -13,40 +13,46 @@ __pycache__/
 .coverage
 htmlcov/
 
-# Environment Variables & Secrets
+# Environment variables and secrets
 .env
 .env.local
 .env.*.local
 *.pem
 *.key
 
-# Editor & IDE settings
+# Editors
 .vscode/
 .idea/
 *.sublime-project
 *.sublime-workspace
 
-# Operating System files
+# Operating system
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# Output & build artifacts
+# Build artifacts and logs
 dist/
 build/
 *.egg-info/
 logs/
 *.log
 
-
-# Model weights (255 MB — too large for GitHub; regenerate via src/model/train_classifier.py)
-models/distilbert_clarity_lint/model.safetensors
+# Hugging Face model checkpoints
 models/distilbert_clarity_lint/checkpoints/
 
-# HuggingFace hub cache
-.cache/
-
-# Next.js frontend
+# Next.js dependencies and build output
 web/node_modules/
 web/.next/
 web/out/
+web/web/node_modules/
+web/web/.next/
+web/web/out/
+
+# Local backups and training artifacts
+_local_backups/
+integration_backups/
+training_runs/
+
+# Local audit files
+web/web/clarity_ui_audit.txt

@@ -1,0 +1,21 @@
+﻿text,gold_label,rules_pred,model_pred,prompt_pred
+The supplier shall deliver the materials as soon as possible.,vague,vague,vague,vague
+The team must resolve several critical issues before launch.,vague,vague,vague,vague
+The contractor should provide regular progress updates.,vague,vague,no_ambiguity,vague
+The report must be submitted within two business days.,no_ambiguity,no_ambiguity,no_ambiguity,no_ambiguity
+"When Rahul met Arjun, he told him that his proposal was rejected.",pronoun,pronoun,pronoun,pronoun
+The manager spoke to the engineer after she reviewed the design.,pronoun,pronoun,no_ambiguity,pronoun
+The client emailed the consultant because they needed clarification.,pronoun,pronoun,pronoun,pronoun
+The administrator must submit the signed form to the finance department by Friday.,no_ambiguity,no_ambiguity,no_ambiguity,no_ambiguity
+The manager discussed the project with the employees in the conference room.,attachment,attachment,vague,attachment
+She saw the technician with the telescope.,attachment,attachment,attachment,attachment
+The analyst reviewed the files on the shared drive.,attachment,attachment,no_ambiguity,attachment
+The committee will meet in Room 204 at 10:00 AM on Monday.,no_ambiguity,no_ambiguity,no_ambiguity,no_ambiguity
+Employees must not access the database and modify customer records without approval.,scope,scope,scope,scope
+The system blocks users who have not verified their email or phone number.,scope,scope,scope,scope
+Staff may use personal devices and access company files only with written permission.,scope,scope,vague,scope
+"Only department managers may approve expense claims above ₹10,000.",no_ambiguity,no_ambiguity,no_ambiguity,no_ambiguity
+The project manager should send the updated report to the client soon after they review it.,pronoun,vague,pronoun,pronoun
+The vendor must replace defective units within five working days of receiving written notice.,no_ambiguity,no_ambiguity,no_ambiguity,no_ambiguity
+The team will update the dashboard after they receive the latest figures.,pronoun,pronoun,no_ambiguity,pronoun
+The application may be suspended if users fail to update their details or provide incorrect information.,scope,scope,scope,scope
